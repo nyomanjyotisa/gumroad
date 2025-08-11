@@ -316,7 +316,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
       followingWishlistsEnabled={following_wishlists_enabled}
     >
       <section className="products-section__container">
-        {state.results.length === 0 || showArchivedNotice || (hasArchivedProducts && !state.search.showArchivedOnly) ? (
+        {state.results.length === 0 || showArchivedNotice ? (
           <div className={`placeholder ${hasArchivedProducts && !state.search.showArchivedOnly ? "mb-12" : ""}`}>
             <figure>
               <img src={placeholder} />
@@ -331,13 +331,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
               </>
             ) : (
               <>
-                {showArchivedNotice ? (
-                  <h2 className="library-header">You've archived all your products.</h2>
-                ) : (
-                  <h2 className="library-header">
-                    You have {archivedCount} archived purchase{archivedCount === 1 ? "" : "s"}.
-                  </h2>
-                )}
+                <h2 className="library-header">You've archived all your products.</h2>
                 <Button
                   color="accent"
                   onClick={(e) => {
@@ -350,6 +344,24 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
               </>
             )}
           </div>
+        ) : null}
+        {archivedCount > 0 && !state.search.showArchivedOnly ? (
+          <section style={{ display: "grid", gap: "var(--spacer-4)" }} className="mb-12">
+            <div className="info" role="status">
+              <p>
+                You have {archivedCount} archived purchase{archivedCount === 1 ? "" : "s"}{". "}
+                <button
+                  className="link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    dispatch({ type: "update-search", search: { showArchivedOnly: true } });
+                  }}
+                >
+                  Click here to view
+                </button>
+              </p>
+            </div>
+          </section>
         ) : null}
         <div className="with-sidebar">
           {!showArchivedNotice && (hasParams || hasArchivedProducts || state.results.length > 9) ? (
