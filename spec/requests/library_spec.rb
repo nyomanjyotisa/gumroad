@@ -182,6 +182,44 @@ describe("Library Scenario", type: :feature, js: true) do
     expect(page).to have_product_card(purchase.link)
   end
 
+  it "shows archived purchases banner with count when user has archived purchases" do
+    active_purchase = create(:purchase, purchaser: @user)
+    archived_purchase1 = create(:purchase, purchaser: @user, is_archived: true)
+    archived_purchase2 = create(:purchase, purchaser: @user, is_archived: true)
+    Link.import(refresh: true, force: true)
+
+    visit "/library"
+
+    # Banner should show with count of 2 archived purchases
+    expect(page).to have_text("You have 2 archived purchases.")
+
+    # Should show active purchase but not archived ones
+    expect(page).to have_product_card(active_purchase.link)
+    expect(page).to_not have_product_card(archived_purchase1.link)
+    expect(page).to_not have_product_card(archived_purchase2.link)
+
+    # Clicking banner should toggle to archived view
+    click_on "See archive"
+    expect(page.current_url).to include("show_archived_only=true")
+
+    # Should now show archived purchases but not active one
+    expect(page).to have_product_card(archived_purchase1.link)
+    expect(page).to have_product_card(archived_purchase2.link)
+    expect(page).to_not have_product_card(active_purchase.link)
+
+    # Banner should not appear when viewing archived purchases
+    expect(page).to_not have_text("You have 2 archived purchases.")
+  end
+
+  it "does not show banner when user has no archived purchases" do
+    create(:purchase, purchaser: @user)
+    Link.import(refresh: true, force: true)
+
+    visit "/library"
+
+    expect(page).to_not have_text("You have 0 archived purchases.")
+  end
+
   it "lists the same product several times if purchased several times" do
     products = create_list(:product, 2, name: "MyProduct")
     category = create(:variant_category, link: products[0])

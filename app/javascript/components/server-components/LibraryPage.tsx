@@ -263,8 +263,10 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
   const isDesktop = useIsAboveBreakpoint("lg");
   const [mobileFiltersExpanded, setMobileFiltersExpanded] = React.useState(false);
   const [showingAllCreators, setShowingAllCreators] = React.useState(false);
-  const hasArchivedProducts = results.some((result) => result.purchase.is_archived);
-  const showArchivedNotice = !state.search.showArchivedOnly && !results.some((result) => !result.purchase.is_archived);
+  const hasArchivedProducts = state.results.some((result) => result.purchase.is_archived);
+  const archivedCount = state.results.filter((result) => result.purchase.is_archived).length;
+  const showArchivedNotice =
+    !state.search.showArchivedOnly && !state.results.some((result) => !result.purchase.is_archived);
   const hasParams =
     state.search.showArchivedOnly || state.search.query || state.search.creators.length || state.search.bundles.length;
   const [deleting, setDeleting] = React.useState<Result | null>(null);
@@ -315,7 +317,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
       followingWishlistsEnabled={following_wishlists_enabled}
     >
       <section className="products-section__container">
-        {results.length === 0 || showArchivedNotice ? (
+        {results.length === 0 || showArchivedNotice || (archivedCount > 0 && !state.search.showArchivedOnly) ? (
           <div className="placeholder">
             <figure>
               <img src={placeholder} />
@@ -330,7 +332,13 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
               </>
             ) : (
               <>
-                <h2 className="library-header">You've archived all your products.</h2>
+                {archivedCount === results.length ? (
+                  <h2 className="library-header">You've archived all your products.</h2>
+                ) : (
+                  <h2 className="library-header">
+                    You have {archivedCount} archived purchase{archivedCount === 1 ? "" : "s"}.
+                  </h2>
+                )}
                 <Button
                   color="accent"
                   onClick={(e) => {
