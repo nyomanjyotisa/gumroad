@@ -291,11 +291,11 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
     url.searchParams.delete("purchase_id");
     window.history.replaceState(window.history.state, "", url.toString());
     if (purchaseIds.length > 0) {
-      const email = results.find(({ purchase }) => purchase.id === purchaseIds[0])?.purchase.email;
+      const email = state.results.find(({ purchase }) => purchase.id === purchaseIds[0])?.purchase.email;
       if (email) showAlert(`Your purchase was successful! We sent a receipt to ${email}.`, "success");
 
       for (const purchaseId of purchaseIds) {
-        const product = results.find(({ purchase }) => purchase.id === purchaseId)?.product;
+        const product = state.results.find(({ purchase }) => purchase.id === purchaseId)?.product;
         if (!product) continue;
 
         if (product.has_third_party_analytics)
@@ -316,12 +316,12 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
       followingWishlistsEnabled={following_wishlists_enabled}
     >
       <section className="products-section__container">
-      {state.results.length === 0 || showArchivedNotice || (hasArchivedProducts && !state.search.showArchivedOnly) ? (
+        {state.results.length === 0 || showArchivedNotice || (hasArchivedProducts && !state.search.showArchivedOnly) ? (
           <div className="placeholder">
             <figure>
               <img src={placeholder} />
             </figure>
-            {results.length === 0 ? (
+            {state.results.length === 0 ? (
               <>
                 <h2 className="library-header">You haven't bought anything... yet!</h2>
                 Once you do, it'll show up here so you can download, watch, read, or listen to all your purchases.
@@ -352,7 +352,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
           </div>
         ) : null}
         <div className="with-sidebar">
-          {!showArchivedNotice && (hasParams || hasArchivedProducts || results.length > 9) ? (
+          {!showArchivedNotice && (hasParams || hasArchivedProducts || state.results.length > 9) ? (
             <div className="stack">
               <header>
                 <div>
