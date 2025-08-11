@@ -212,6 +212,64 @@ describe("Library Scenario", type: :feature, js: true) do
     expect(page).to_not have_text("You have 0 archived purchases.")
   end
 
+  it "shows singular grammar when user has exactly 1 archived purchase" do
+    active_purchase = create(:purchase, purchaser: @user)
+    archived_purchase = create(:purchase, purchaser: @user, is_archived: true)
+    Link.import(refresh: true, force: true)
+
+    visit "/library"
+
+    expect(page).to have_selector(".library-header", text: "You have 1 archived purchase.")
+    expect(page).to have_product_card(active_purchase.link)
+
+    click_on "See archive"
+    expect(page.current_url).to include("show_archived_only=true")
+    expect(page).to have_product_card(archived_purchase.link)
+  end
+
+  it "shows 'You've archived all your products.' when all purchases are archived" do
+    archived_1 = create(:purchase, purchaser: @user, is_archived: true)
+    archived_2 = create(:purchase, purchaser: @user, is_archived: true)
+    Link.import(refresh: true, force: true)
+
+    visit "/library"
+
+    expect(page).to have_selector(".library-header", text: "You've archived all your products.")
+    click_on "See archive"
+    expect(page).to have_product_card(archived_1.link)
+    expect(page).to have_product_card(archived_2.link)
+  end
+
+  it "does not show banner when viewing archived purchases via param" do
+    create(:purchase, purchaser: @user, is_archived: true)
+    Link.import(refresh: true, force: true)
+
+    visit "/library?show_archived_only=true"
+
+    expect(page).to_not have_selector(".library-header", text: "archived purchases")
+  end
+
+  it "updates banner count after archiving an active purchase (on reload)" do
+    active_product_1 = create(:product, name: "Alpha Product")
+    active_product_2 = create(:product, name: "Beta Product")
+    active_1 = create(:purchase, purchaser: @user, link: active_product_1)
+    active_2 = create(:purchase, purchaser: @user, link: active_product_2)
+    Link.import(refresh: true, force: true)
+
+    visit "/library"
+    expect(page).to_not have_selector(".library-header", text: "archived purchase")
+
+    card = find_product_card(active_1.link)
+    card.hover
+    within(card) do
+      find('[aria-label="Open product action menu"]', visible: :visible).click
+    end
+    click_on "Archive"
+
+    expect(page).to have_selector(".library-header", text: "You have 1 archived purchase.")
+    expect(page).to have_product_card(active_2.link)
+  end
+
   it "lists the same product several times if purchased several times" do
     products = create_list(:product, 2, name: "MyProduct")
     category = create(:variant_category, link: products[0])
