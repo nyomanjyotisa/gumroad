@@ -190,21 +190,16 @@ describe("Library Scenario", type: :feature, js: true) do
 
     visit "/library"
 
-    # Banner should show with count of 2 archived purchases
-    expect(page).to have_text("You have 2 archived purchases.")
+    expect(page).to have_selector(".library-header", text: "You have 2 archived purchases.")
 
-    # Should show active purchase
     expect(page).to have_product_card(active_purchase.link)
 
-    # Clicking banner should toggle to archived view
     click_on "See archive"
     expect(page.current_url).to include("show_archived_only=true")
 
-    # Should now show archived purchases
     expect(page).to have_product_card(archived_purchase1.link)
     expect(page).to have_product_card(archived_purchase2.link)
 
-    # Banner should not appear when viewing archived purchases
     expect(page).to_not have_text("You have 2 archived purchases.")
   end
 
