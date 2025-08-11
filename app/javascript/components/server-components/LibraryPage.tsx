@@ -331,7 +331,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
               </>
             ) : (
               <>
-                {archivedCount === results.length ? (
+                {showArchivedNotice ? (
                   <h2 className="library-header">You've archived all your products.</h2>
                 ) : (
                   <h2 className="library-header">
