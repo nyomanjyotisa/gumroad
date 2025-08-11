@@ -263,8 +263,9 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
   const isDesktop = useIsAboveBreakpoint("lg");
   const [mobileFiltersExpanded, setMobileFiltersExpanded] = React.useState(false);
   const [showingAllCreators, setShowingAllCreators] = React.useState(false);
-  const hasArchivedProducts = state.results.some((result) => result.purchase.is_archived);
-  const archivedCount = state.results.filter((result) => result.purchase.is_archived).length;
+  const archivedProducts = state.results.filter((result) => result.purchase.is_archived);
+  const archivedCount = archivedProducts.length;
+  const hasArchivedProducts = archivedCount > 0;
   const showArchivedNotice = !state.search.showArchivedOnly && !state.results.some((result) => !result.purchase.is_archived);
   const hasParams =
     state.search.showArchivedOnly || state.search.query || state.search.creators.length || state.search.bundles.length;
