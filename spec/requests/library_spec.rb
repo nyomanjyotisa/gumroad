@@ -235,6 +235,8 @@ describe("Library Scenario", type: :feature, js: true) do
     visit "/library"
 
     expect(page).to have_selector(".library-header", text: "You've archived all your products.")
+    expect(page).to_not have_text("archived purchase")
+
     click_on "See archive"
     expect(page).to have_product_card(archived_1.link)
     expect(page).to have_product_card(archived_2.link)
@@ -249,7 +251,7 @@ describe("Library Scenario", type: :feature, js: true) do
     expect(page).to_not have_text("archived purchase")
   end
 
-  it "updates banner count after archiving an active purchase (on reload)" do
+  it "updates banner count after archiving an active purchase" do
     active_product_1 = create(:product, name: "Alpha Product")
     active_product_2 = create(:product, name: "Beta Product")
     active_1 = create(:purchase, purchaser: @user, link: active_product_1)

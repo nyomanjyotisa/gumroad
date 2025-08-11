@@ -345,7 +345,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
             )}
           </div>
         ) : null}
-        {archivedCount > 0 && !state.search.showArchivedOnly ? (
+        {archivedCount > 0 && !state.search.showArchivedOnly && !showArchivedNotice ? (
           <section style={{ display: "grid", gap: "var(--spacer-4)" }} className="mb-12">
             <div className="info" role="status">
               <p>
