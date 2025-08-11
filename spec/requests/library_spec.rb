@@ -194,7 +194,7 @@ describe("Library Scenario", type: :feature, js: true) do
 
     expect(page).to have_product_card(active_purchase.link)
 
-    click_on "click here to view"
+    click_on "Click here to view"
     expect(page.current_url).to include("show_archived_only=true")
 
     expect(page).to have_product_card(archived_purchase1.link)
@@ -222,7 +222,7 @@ describe("Library Scenario", type: :feature, js: true) do
     expect(page).to have_text("You have 1 archived purchase")
     expect(page).to have_product_card(active_purchase.link)
 
-    click_on "click here to view"
+    click_on "Click here to view"
     expect(page.current_url).to include("show_archived_only=true")
     expect(page).to have_product_card(archived_purchase.link)
   end
