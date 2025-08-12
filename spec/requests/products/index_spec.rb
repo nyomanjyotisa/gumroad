@@ -112,6 +112,26 @@ describe "Products Page Scenario", type: :feature, js: true do
         end
       end
     end
+
+    it "shows empty state immediately after deleting the last product" do
+      product = create(:product, user: seller)
+
+      visit(products_path)
+
+      within find_product_row(product) do
+        select_disclosure "Open product action menu" do
+          click_on "Delete"
+        end
+        click_on "Confirm"
+      end
+
+      expect(page).to have_alert(text: "Product deleted!")
+
+      wait_for_ajax
+
+      expect(page).to have_text("We’ve never met an idea we didn’t like.")
+      expect(page).not_to have_selector(:table, "Products")
+    end
   end
 
   describe "duplication" do

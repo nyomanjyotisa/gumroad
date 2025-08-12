@@ -15,6 +15,8 @@ const ProductsPage = ({
   query,
   setEnableArchiveTab,
   type = "products",
+  onProductsChange,
+  onMembershipsChange,
 }: {
   memberships: Membership[];
   membershipsPagination: PaginationProps;
@@ -23,6 +25,8 @@ const ProductsPage = ({
   query: string | null;
   setEnableArchiveTab?: (enable: boolean) => void;
   type?: Tab;
+  onProductsChange?: ((products: Product[]) => void) | undefined;
+  onMembershipsChange?: ((memberships: Membership[]) => void) | undefined;
 }) => (
   <div style={{ display: "grid", gap: "var(--spacer-7)" }}>
     {memberships.length > 0 ? (
@@ -32,6 +36,7 @@ const ProductsPage = ({
         pagination={membershipsPagination}
         selectedTab={type}
         setEnableArchiveTab={setEnableArchiveTab}
+        onMembershipsChange={onMembershipsChange}
       />
     ) : null}
 
@@ -42,6 +47,7 @@ const ProductsPage = ({
         pagination={productsPagination}
         selectedTab={type}
         setEnableArchiveTab={setEnableArchiveTab}
+        onProductsChange={onProductsChange}
       />
     ) : null}
   </div>

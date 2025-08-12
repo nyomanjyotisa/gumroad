@@ -25,6 +25,7 @@ export const ProductsPageMembershipsTable = (props: {
   selectedTab: Tab;
   query: string | null;
   setEnableArchiveTab: ((enable: boolean) => void) | undefined;
+  onMembershipsChange?: ((memberships: Membership[]) => void) | undefined;
 }) => {
   const [{ entries: memberships, pagination, isLoading }, setState] = React.useState<State>({
     entries: props.entries,
@@ -74,6 +75,12 @@ export const ProductsPageMembershipsTable = (props: {
   React.useEffect(() => {
     if (props.query !== null) debouncedLoadMemberships();
   }, [props.query]);
+
+  React.useEffect(() => {
+    if (memberships) {
+      props.onMembershipsChange?.([...memberships]);
+    }
+  }, [memberships]);
 
   const reloadMemberships = () => loadMemberships(pagination.page);
 

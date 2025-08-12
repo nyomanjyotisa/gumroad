@@ -25,6 +25,7 @@ export const ProductsPageProductsTable = (props: {
   selectedTab: Tab;
   query: string | null;
   setEnableArchiveTab: ((enable: boolean) => void) | undefined;
+  onProductsChange?: ((products: Product[]) => void) | undefined;
 }) => {
   const [{ entries: products, pagination, isLoading }, setState] = React.useState<State>({
     entries: props.entries,
@@ -75,6 +76,12 @@ export const ProductsPageProductsTable = (props: {
   React.useEffect(() => {
     if (props.query !== null) debouncedLoadProducts();
   }, [props.query]);
+
+  React.useEffect(() => {
+    if (products) {
+      props.onProductsChange?.([...products]);
+    }
+  }, [products]);
 
   const reloadProducts = () => loadProducts(pagination.page);
 

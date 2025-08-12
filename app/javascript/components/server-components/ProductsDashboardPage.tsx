@@ -39,6 +39,9 @@ export const ProductsDashboardPage = ({
     if (isSearchPopoverOpen) searchInputRef.current?.focus();
   }, [isSearchPopoverOpen]);
 
+  const [localProducts, setLocalProducts] = React.useState(products);
+  const [localMemberships, setLocalMemberships] = React.useState(memberships);
+
   return (
     <ProductsLayout
       selectedTab="products"
@@ -76,7 +79,7 @@ export const ProductsDashboardPage = ({
       }
     >
       <section>
-        {memberships.length === 0 && products.length === 0 ? (
+        {localMemberships.length === 0 && localProducts.length === 0 ? (
           <div className="placeholder">
             <figure>
               <img src={placeholder} />
@@ -97,10 +100,12 @@ export const ProductsDashboardPage = ({
           </div>
         ) : (
           <ProductsPage
-            memberships={memberships}
+            memberships={localMemberships}
             membershipsPagination={membershipsPagination}
-            products={products}
+            products={localProducts}
             productsPagination={productsPagination}
+            onProductsChange={setLocalProducts}
+            onMembershipsChange={setLocalMemberships}
             query={query}
             setEnableArchiveTab={setEnableArchiveTab}
           />
