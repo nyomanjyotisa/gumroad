@@ -6,6 +6,13 @@ class ProductDuplicatesController < Sellers::BaseController
   def create
     authorize [:product_duplicates, @product]
 
+    unless @product.send(:skip_daily_product_creation_limit?)
+      @product.send(:validate_daily_product_creation_limit)
+      if @product.errors.any?
+        render(json: { success: false, error_message: @product.errors.full_messages.join(", ") }) && (return)
+      end
+    end
+
     if @product.is_duplicating
       render(json: { success: false, error_message: "Duplication in progress..." }) && (return)
     end

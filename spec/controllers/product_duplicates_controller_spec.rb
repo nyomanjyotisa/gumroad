@@ -22,11 +22,51 @@ describe ProductDuplicatesController do
     product.save_files!(file_params)
   end
 
-  describe "POST create" do
+  def create_products_in_bulk(user, count)
+    unique_permalink_chars = ("a".."z").to_a
+    rows = Array.new(count) do |i|
+      FactoryBot.build(
+        :product,
+        user: user,
+        created_at: Time.current,
+        updated_at: Time.current,
+        unique_permalink: "product-#{i}-#{SecureRandom.alphanumeric(5)}",
+      ).attributes
+    end
+
+    Link.insert_all(rows)
+  end
+
+  describe "POST create", :enforce_product_creation_limit do
     it_behaves_like "authorize called for action", :post, :create do
       let(:request_params) { { id: product.unique_permalink } }
       let(:record) { product }
       let(:policy_klass) { ProductDuplicates::LinkPolicy }
+    end
+
+    context "when user exceeds daily product creation limit" do
+      let!(:non_compliant_user) { create(:user, user_risk_state: "not_reviewed") }
+      let!(:product) { create(:product, user: non_compliant_user) }
+
+      before do
+        create_products_in_bulk(non_compliant_user, 10)
+        sign_in(non_compliant_user)
+      end
+
+      it "returns an error message" do
+        post :create, params: { id: product.unique_permalink }
+
+        expect(response.parsed_body).to eq({
+          "success" => false,
+          "error_message" => "Sorry, you can only create 10 products per day."
+        })
+      end
+
+      it "does not enqueue DuplicateProductWorker" do
+        expect(DuplicateProductWorker).not_to receive(:perform_async)
+
+        post :create, params: { id: product.unique_permalink }
+      end
     end
 
     it "returns 404 when the id parameter is missing" do
