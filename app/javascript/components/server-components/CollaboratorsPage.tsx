@@ -324,9 +324,9 @@ const CollaboratorForm = () => {
   const formData = cast<CollaboratorFormData>(useLoaderData());
   const isEditing = "id" in formData;
 
-  const hasEnabledUnpublishedOrIneligibleProducts = isEditing && formData.products.some(
-    product => product.enabled && (!product.published || product.has_another_collaborator)
-  );
+  const hasEnabledUnpublishedOrIneligibleProducts =
+    isEditing &&
+    formData.products.some((product) => product.enabled && (!product.published || product.has_another_collaborator));
 
   const [showIneligibleProducts, setShowIneligibleProducts] = React.useState(hasEnabledUnpublishedOrIneligibleProducts);
   const [collaboratorEmail, setCollaboratorEmail] = React.useState<{ value: string; error?: string }>({

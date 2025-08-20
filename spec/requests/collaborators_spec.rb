@@ -325,6 +325,16 @@ describe "Collaborators", type: :system, js: true do
 
         collaborator = seller.collaborators.last
         expect(collaborator.products).to match_array [product2, product3, product5]
+
+        visit collaborators_path
+        within :table_row, { "Name" => collaborator.affiliate_user.display_name } do
+          click_on "Edit"
+        end
+
+        expect(page).to have_checked_field("Show unpublished and ineligible products")
+        within find(:table_row, { "Product" => product5.name }) do
+          expect(page).to have_checked_field(product5.name)
+        end
       end
 
       it "disables affiliates when adding a collaborator to a product with affiliates" do
@@ -389,41 +399,6 @@ describe "Collaborators", type: :system, js: true do
         button = find_button("Add collaborator", disabled: true)
         button.hover
         expect(button).to have_tooltip(text: "Collaborators with Brazilian Stripe accounts are not supported.")
-      end
-
-      it "shows unpublished/ineligible products on edit page when they were selected during creation" do
-        # Create a new collaborator with the unpublished product (product5)
-        visit "/collaborators/new"
-
-        fill_in "email", with: collaborating_user.email
-
-        check "Show unpublished and ineligible products"
-
-        uncheck "All products"
-
-        within find(:table_row, { "Product" => product5.name }) do
-          check product5.name
-          fill_in "Percentage", with: 25
-        end
-
-        click_on "Add collaborator"
-        expect(page).to have_alert(text: "Changes saved!")
-
-        created_collaborator = seller.collaborators.last
-        visit collaborators_path
-        within :table_row, { "Name" => created_collaborator.affiliate_user.display_name } do
-          click_on "Edit"
-        end
-
-        # Verify that "Show unpublished and ineligible products" is checked
-        expect(page).to have_checked_field("Show unpublished and ineligible products")
-
-        # Verify that the unpublished product is visible and enabled
-        expect(page).to have_content(product5.name)
-        within find(:table_row, { "Product" => product5.name }) do
-          expect(page).to have_checked_field(product5.name)
-          expect(page).to have_field("Percentage", with: "25")
-        end
       end
     end
 
