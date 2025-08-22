@@ -72,6 +72,7 @@ const ArticlesIndexPage = ({ categories }: ArticlesIndexPageProps) => {
         ...category,
         articles: category.articles.filter((article) => article.title.toLowerCase().includes(searchTerm.toLowerCase())),
       }))
+      .filter((category) => category.articles.length > 0)
     : categories;
 
   return (
@@ -85,9 +86,22 @@ const ArticlesIndexPage = ({ categories }: ArticlesIndexPageProps) => {
         className="w-full"
       />
       <div className="mt-12 space-y-12">
-        {filteredCategories.map((category) => (
-          <CategoryArticles key={category.url} category={category} searchTerm={searchTerm} />
-        ))}
+        {filteredCategories.length > 0 ? (
+          filteredCategories.map((category) => (
+            <CategoryArticles key={category.url} category={category} searchTerm={searchTerm} />
+          ))
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center py-12 text-center">
+            <div className="flex flex-col items-center justify-center">
+              <p className="text-lg text-gray-600 dark:text-gray-300">
+                No results found for "{searchTerm}"
+              </p>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">
+                Try different keywords
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
