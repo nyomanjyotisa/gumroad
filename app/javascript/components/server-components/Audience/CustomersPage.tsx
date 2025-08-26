@@ -52,6 +52,7 @@ import {
   formatPriceCentsWithoutCurrencySymbol,
 } from "$app/utils/currency";
 import { formatCallDate } from "$app/utils/date";
+import { isValidEmail } from "$app/utils/email";
 import FileUtils from "$app/utils/file";
 import { asyncVoid } from "$app/utils/promise";
 import { RecurrenceId, recurrenceLabels } from "$app/utils/recurringPricing";
@@ -75,7 +76,6 @@ import { ReviewResponseForm } from "$app/components/ReviewResponseForm";
 import { ReviewVideoPlayer } from "$app/components/ReviewVideoPlayer";
 import { Select } from "$app/components/Select";
 import { showAlert } from "$app/components/server-components/Alert";
-import { isValidEmail } from "$app/utils/email";
 import { Toggle } from "$app/components/Toggle";
 import { useDebouncedCallback } from "$app/components/useDebouncedCallback";
 import { useOnChange } from "$app/components/useOnChange";
@@ -1525,8 +1525,11 @@ const EmailSection = ({
   const handleSave = async () => {
     if (!onSave) return;
 
-    if (!isValidEmail(email)) {
-      showAlert("Please enter a valid email", "error");
+    const emailError =
+      email.length === 0 ? "Email must be provided" : !isValidEmail(email) ? "Please enter a valid email" : null;
+
+    if (emailError) {
+      showAlert(emailError, "error");
       return;
     }
 
