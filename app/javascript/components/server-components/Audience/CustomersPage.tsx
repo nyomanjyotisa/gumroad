@@ -75,6 +75,7 @@ import { ReviewResponseForm } from "$app/components/ReviewResponseForm";
 import { ReviewVideoPlayer } from "$app/components/ReviewVideoPlayer";
 import { Select } from "$app/components/Select";
 import { showAlert } from "$app/components/server-components/Alert";
+import { isValidEmail } from "$app/utils/email";
 import { Toggle } from "$app/components/Toggle";
 import { useDebouncedCallback } from "$app/components/useDebouncedCallback";
 import { useOnChange } from "$app/components/useOnChange";
@@ -1523,6 +1524,12 @@ const EmailSection = ({
 
   const handleSave = async () => {
     if (!onSave) return;
+
+    if (!isValidEmail(email)) {
+      showAlert("Please enter a valid email", "error");
+      return;
+    }
+
     setIsLoading(true);
     await onSave(email);
     setIsLoading(false);
