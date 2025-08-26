@@ -264,7 +264,7 @@ const CoverTab = ({
   onClick: () => void;
   onRemove: () => void;
 }) => {
-  const isMobile = !useIsAboveBreakpoint("sm");
+  const isDesktop = useIsAboveBreakpoint("lg");
   const [showDelete, setShowDelete] = React.useState(false);
 
   const hasThumbnail = cover.type !== "video" && (cover.type !== "oembed" || cover.thumbnail != null);
@@ -291,7 +291,7 @@ const CoverTab = ({
         <span>{cover.type === "oembed" ? "📺" : cover.type === "video" ? "📼" : "📦"}</span>
       )}
 
-      {(showDelete || isMobile) ? (
+      {(showDelete || !isDesktop) ? (
         <RemoveButton
           onClick={(evt) => {
             evt.stopPropagation();
