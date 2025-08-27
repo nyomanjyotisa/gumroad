@@ -342,6 +342,7 @@ const CustomersPage = ({
                       id={`${uid}-after-date`}
                       value={createdAfter}
                       onChange={(createdAfter) => updateQuery({ createdAfter })}
+                      max={createdBefore || undefined}
                     />
                     <small suppressHydrationWarning>{`00:00  ${timeZoneAbbreviation}`}</small>
                   </fieldset>
@@ -351,6 +352,7 @@ const CustomersPage = ({
                       id={`${uid}-before-date`}
                       value={createdBefore}
                       onChange={(createdBefore) => updateQuery({ createdBefore })}
+                      min={createdAfter || undefined}
                     />
                     <small suppressHydrationWarning>{`11:59 ${timeZoneAbbreviation}`}</small>
                   </fieldset>
