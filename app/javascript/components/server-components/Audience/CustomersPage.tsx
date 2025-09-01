@@ -3,7 +3,6 @@ import cx from "classnames";
 import { lightFormat, subMonths } from "date-fns";
 import { format } from "date-fns-tz";
 import * as React from "react";
-import { createCast } from "ts-safe-cast";
 
 import {
   Address,
@@ -57,7 +56,6 @@ import FileUtils from "$app/utils/file";
 import { asyncVoid } from "$app/utils/promise";
 import { RecurrenceId, recurrenceLabels } from "$app/utils/recurringPricing";
 import { AbortError, assertResponseError } from "$app/utils/request";
-import { register } from "$app/utils/serverComponentUtil";
 
 import { Button, NavigationButton } from "$app/components/Button";
 import { useCurrentSeller } from "$app/components/CurrentSeller";
@@ -88,6 +86,18 @@ import placeholder from "$assets/images/placeholders/customers.png";
 
 type Product = { id: string; name: string; variants: { id: string; name: string }[] };
 
+export type CustomerPageProps = {
+  customers: Customer[];
+  pagination: PaginationProps | null;
+  product_id: string | null;
+  products: Product[];
+  count: number;
+  currency_type: CurrencyCode;
+  countries: string[];
+  can_ping: boolean;
+  show_refund_fee_notice: boolean;
+};
+
 const year = new Date().getFullYear();
 
 const formatPrice = (priceCents: number, currencyType: CurrencyCode, recurrence?: RecurrenceId | null) =>
@@ -110,17 +120,7 @@ const CustomersPage = ({
   can_ping,
   show_refund_fee_notice,
   ...initialState
-}: {
-  customers: Customer[];
-  pagination: PaginationProps | null;
-  product_id: string | null;
-  products: Product[];
-  count: number;
-  currency_type: CurrencyCode;
-  countries: string[];
-  can_ping: boolean;
-  show_refund_fee_notice: boolean;
-}) => {
+}: CustomerPageProps) => {
   const currentSeller = useCurrentSeller();
   const userAgentInfo = useUserAgentInfo();
 
@@ -2559,4 +2559,4 @@ const CommissionSection = ({
   );
 };
 
-export default register({ component: CustomersPage, propParser: createCast() });
+export default CustomersPage;
