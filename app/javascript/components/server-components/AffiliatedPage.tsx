@@ -294,7 +294,7 @@ const AffiliatedPage = ({
           </Button>
         ) : (
           <>
-            <Search onSearch={handleSearch} value={state.query} />
+            {initialAffiliatedProducts.length > 0 && <Search onSearch={handleSearch} value={state.query} />}
             <WithTooltip position="bottom" tip={affiliatesDisabledReason}>
               <Button color="accent" disabled={affiliatesDisabledReason !== null} onClick={() => toggleOpen(true)}>
                 Gumroad affiliate
