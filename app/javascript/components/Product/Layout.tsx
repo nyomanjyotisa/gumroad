@@ -159,7 +159,7 @@ export const Layout = (
     </>
   );
 
-  const mainSection = <section>{productView}</section>;
+  const mainSection = <section className="mb-20 lg:mb-0">{productView}</section>;
 
   return (
     <>
