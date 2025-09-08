@@ -272,7 +272,8 @@ const CoverTab = ({
   return (
     <Button
       onClick={onClick}
-      style={{ cursor: "move", padding: hasThumbnail ? "unset" : undefined, position: "relative" }}
+      className="relative"
+      style={{ cursor: "move", padding: hasThumbnail ? "unset" : undefined }}
       onMouseEnter={() => setShowDelete(true)}
       onMouseLeave={() => setShowDelete(false)}
       role="tab"
