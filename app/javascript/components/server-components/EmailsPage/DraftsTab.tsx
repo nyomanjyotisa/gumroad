@@ -111,7 +111,7 @@ export const DraftsTab = () => {
   const userAgentInfo = useUserAgentInfo();
 
   return (
-    <Layout selectedTab="drafts">
+    <Layout selectedTab="drafts" hasData={!!data?.installments?.length}>
       <div>
         {installments.length > 0 ? (
           <>
