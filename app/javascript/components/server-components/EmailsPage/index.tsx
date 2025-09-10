@@ -37,11 +37,11 @@ export const editEmailPath = (id: string) => `/emails/${id}/edit`;
 export const Layout = ({
   selectedTab,
   children,
-  hasData,
+  hasPosts,
 }: {
   selectedTab: (typeof TABS)[number];
   children: React.ReactNode;
-  hasData?: boolean;
+  hasPosts?: boolean;
 }) => {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const [isSearchPopoverOpen, setIsSearchPopoverOpen] = React.useState(false);
@@ -56,7 +56,7 @@ export const Layout = ({
         <h1>Emails</h1>
 
         <div className="actions">
-          {hasData ? (
+          {hasPosts ? (
             <Popover
               open={isSearchPopoverOpen}
               onToggle={setIsSearchPopoverOpen}
