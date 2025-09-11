@@ -14,7 +14,8 @@ const LookupLayout = ({ children, title, type }: {
   const [email, setEmail] = React.useState<{ value: string; error?: boolean }>({ value: "" })
   const [last4, setLast4] = React.useState<{ value: string; error?: boolean }>({ value: "" })
   const [invoiceId, setInvoiceId] = React.useState<{ value: string; error?: boolean }>({ value: "" })
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isCardLoading, setIsCardLoading] = React.useState(false)
+  const [isPaypalLoading, setIsPaypalLoading] = React.useState(false)
   const [success, setSuccess] = React.useState<boolean | null>(null)
 
   const handleCardLookup = async () => {
@@ -34,7 +35,7 @@ const LookupLayout = ({ children, title, type }: {
       return;
     }
 
-    setIsLoading(true)
+    setIsCardLoading(true)
     try {
       const result = await lookupCharges({
         email: email.value,
@@ -45,7 +46,7 @@ const LookupLayout = ({ children, title, type }: {
       assertResponseError(error);
       showAlert(error.message, "error")
     } finally {
-      setIsLoading(false)
+      setIsCardLoading(false)
     }
   }
 
@@ -55,7 +56,7 @@ const LookupLayout = ({ children, title, type }: {
       return
     }
 
-    setIsLoading(true)
+    setIsPaypalLoading(true)
     try {
       const result = await lookupPaypalCharges({ invoiceId: invoiceId.value })
       setSuccess(result.success)
@@ -63,7 +64,7 @@ const LookupLayout = ({ children, title, type }: {
       assertResponseError(error);
       showAlert(error.message, "error")
     } finally {
-      setIsLoading(false)
+      setIsPaypalLoading(false)
     }
   }
 
@@ -137,9 +138,9 @@ const LookupLayout = ({ children, title, type }: {
             <button
               className="button primary"
               type="submit"
-              disabled={isLoading}
+              disabled={isCardLoading}
             >
-              {isLoading ? "Searching..." : "Search"}
+              {isCardLoading ? "Searching..." : "Search"}
             </button>
           </section>
         </form>
@@ -167,9 +168,9 @@ const LookupLayout = ({ children, title, type }: {
               <button
                 className="button button-paypal"
                 type="submit"
-                disabled={isLoading}
+                disabled={isPaypalLoading}
               >
-                {isLoading ? "Searching..." : "Search"}
+                {isPaypalLoading ? "Searching..." : "Search"}
               </button>
             </fieldset>
           </section>
