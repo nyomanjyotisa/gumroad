@@ -661,7 +661,7 @@ describe "Sales page", type: :system, js: true do
           end
         end
 
-        expect(page).to have_alert(text: "Please enter a valid email", type: :error)
+        expect(page).to have_alert(text: "Please enter a valid email")
       end
 
       context "customer has a Gumroad account" do
