@@ -214,9 +214,7 @@ const FileEmbedNodeView = ({ node, editor, getPos, updateAttributes }: NodeViewP
     const thumbnail = files?.[0];
     if (thumbnail) uploadThumbnail(thumbnail);
   };
-  const thumbnailInput = (
-    <input type="file" accept="jpeg,jpg,png,gif" onChange={(e) => onThumbnailSelected(e.target.files)} />
-  );
+  const thumbnailInput = <input type="file" accept="image/*" onChange={(e) => onThumbnailSelected(e.target.files)} />;
 
   const removeSubtitle = (url: string) =>
     updateFile({ subtitle_files: file.subtitle_files.filter((subtitle) => subtitle.url !== url) });
