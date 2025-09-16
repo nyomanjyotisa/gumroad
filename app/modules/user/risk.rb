@@ -14,6 +14,7 @@ module User::Risk
   PROBATION_WITH_REMINDER_DAYS = 30
   PROBATION_REVIEW_DAYS = 2
   MAX_REFUND_QUEUE_SIZE = 1000
+  MAX_CHARGEBACK_RATE_ALLOWED_FOR_PAYOUTS = 3.0
 
   def self.contact_iffy_risk_analysis(iffy_request_parameters)
     return nil unless Rails.env.production?
@@ -82,6 +83,10 @@ module User::Risk
 
   def not_verified?
     !verified
+  end
+
+  def log_suspension_time_to_mongo
+    Mongoer.async_write(MongoCollections::USER_SUSPENSION_TIME, "user_id" => id, "suspended_at" => Time.current.to_s)
   end
 
   def disable_links_and_tell_chat
@@ -203,6 +208,11 @@ module User::Risk
       else
         PAYOUTS_STATUS_PAYABLE
       end
+  end
+
+  PAYOUT_PAUSE_SOURCES = %w[stripe admin system user].freeze
+  PAYOUT_PAUSE_SOURCES.each do |source|
+    self.const_set("PAYOUT_PAUSE_SOURCE_#{source.upcase}", source)
   end
 
   class_methods do
