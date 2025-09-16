@@ -208,7 +208,7 @@ class ProductFile < ApplicationRecord
     extension = s3_extension
     name_with_extension = display_name.ends_with?(extension) ? display_name : "#{display_name}#{extension}"
     new_key = MultipartTransfer.transfer_to_s3(self.s3_object.presigned_url(:get, expires_in: SignedUrlHelper::SIGNED_S3_URL_VALID_FOR_MAXIMUM.to_i).to_s, destination_filename: name_with_extension, existing_s3_object: self.s3_object)
-    self.url = URI::DEFAULT_PARSER.unescape("https://s3.amazonaws.com/#{S3_BUCKET}/#{new_key}")
+    self.url = URI::DEFAULT_PARSER.unescape("https://s3.ap-southeast-2.amazonaws.com/#{S3_BUCKET}/#{new_key}")
     save!
   end
 

@@ -35,12 +35,12 @@ PUBLIC_STORAGE_CDN_S3_PROXY_HOST = public_assets_cdn_hosts.dig(Rails.env.to_sym,
 if CDN_S3_PROXY_HOST && PUBLIC_STORAGE_CDN_S3_PROXY_HOST
   if Rails.env.production?
     # Optimize CDN_URL_MAP for production to reduce the number of string look ups.
-    CDN_URL_MAP["https://s3.amazonaws.com/gumroad/"] = "#{CDN_S3_PROXY_HOST}/res/gumroad/"
-    CDN_URL_MAP["https://gumroad-public-storage.s3.amazonaws.com/"] = "#{PUBLIC_STORAGE_CDN_S3_PROXY_HOST}/"
+    CDN_URL_MAP["https://s3.ap-southeast-2.amazonaws.com/gumroad/"] = "#{CDN_S3_PROXY_HOST}/res/gumroad/"
+    CDN_URL_MAP["https://gumroad-public-storage.s3.ap-southeast-2.amazonaws.com/"] = "#{PUBLIC_STORAGE_CDN_S3_PROXY_HOST}/"
   else
-    CDN_URL_MAP.merge!("https://s3.amazonaws.com/gumroad/" => "#{CDN_S3_PROXY_HOST}/res/gumroad/",
-                       "https://s3.amazonaws.com/gumroad-staging/" => "#{CDN_S3_PROXY_HOST}/res/gumroad-staging/",
-                       "https://s3.amazonaws.com/gumroad-dev-jyo/" => "#{CDN_S3_PROXY_HOST}/res/gumroad-dev-jyo/",
-                       "https://gumroad-dev-public-storage-jyo.s3.amazonaws.com/" => "#{PUBLIC_STORAGE_CDN_S3_PROXY_HOST}/")
+    CDN_URL_MAP.merge!("https://s3.ap-southeast-2.amazonaws.com/gumroad/" => "#{CDN_S3_PROXY_HOST}/res/gumroad/",
+                       "https://s3.ap-southeast-2.amazonaws.com/gumroad-staging/" => "#{CDN_S3_PROXY_HOST}/res/gumroad-staging/",
+                       "https://s3.ap-southeast-2.amazonaws.com/gumroad-dev-jyo/" => "#{CDN_S3_PROXY_HOST}/res/gumroad-dev-jyo/",
+                       "https://gumroad-dev-public-storage-jyo.s3.ap-southeast-2.amazonaws.com/" => "#{PUBLIC_STORAGE_CDN_S3_PROXY_HOST}/")
   end
 end

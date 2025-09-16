@@ -245,7 +245,7 @@ describe User, :vcr do
 
   describe "has_cdn_url" do
     before do
-      stub_const("CDN_URL_MAP", { "https://gumroad-specs.s3.amazonaws.com" => "https://public-files.gumroad.com", "https://s3.amazonaws.com/gumroad/" => "https://public-files.gumroad.com/res/gumroad/" })
+      stub_const("CDN_URL_MAP", { "https://gumroad-specs.s3.ap-southeast-2.amazonaws.com" => "https://public-files.gumroad.com", "https://s3.ap-southeast-2.amazonaws.com/gumroad/" => "https://public-files.gumroad.com/res/gumroad/" })
     end
 
     describe "#subscribe_preview_url" do
@@ -1264,7 +1264,7 @@ describe User, :vcr do
 
         it "returns URL to user's subscribe preview" do
           key = @user_with_preview.subscribe_preview.key
-          expect(@user_with_preview.subscribe_preview_url).to match("https://gumroad-specs.s3.amazonaws.com/#{key}")
+          expect(@user_with_preview.subscribe_preview_url).to match("https://gumroad-specs.s3.ap-southeast-2.amazonaws.com/#{key}")
         end
       end
     end
@@ -1283,7 +1283,7 @@ describe User, :vcr do
 
         it "returns URL to user's avatar" do
           variant = @user_with_avatar.avatar.variant(resize_to_limit: [256, 256]).processed.key
-          expect(@user_with_avatar.resized_avatar_url(size: 256)).to match("https://gumroad-specs.s3.amazonaws.com/#{variant}")
+          expect(@user_with_avatar.resized_avatar_url(size: 256)).to match("https://gumroad-specs.s3.ap-southeast-2.amazonaws.com/#{variant}")
         end
       end
     end
@@ -1306,7 +1306,7 @@ describe User, :vcr do
         end
 
         it "returns URL to user's avatar" do
-          expect(@user_with_avatar.avatar_url).to match("https://gumroad-specs.s3.amazonaws.com/#{@user_with_avatar.avatar_variant.key}")
+          expect(@user_with_avatar.avatar_url).to match("https://gumroad-specs.s3.ap-southeast-2.amazonaws.com/#{@user_with_avatar.avatar_variant.key}")
         end
       end
 
@@ -2273,7 +2273,7 @@ describe User, :vcr do
 
   describe "#alive_product_files_excluding_product" do
     before do
-      s3_file_url = ->(suffix) { "https://s3.amazonaws.com/gumroad-specs/attachment/manual-#{suffix}.pdf" }
+      s3_file_url = ->(suffix) { "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/manual-#{suffix}.pdf" }
 
       @user1 = create(:user)
       @product1 = create(:product, user: @user1)
@@ -2333,7 +2333,7 @@ describe User, :vcr do
 
     it "returns alive product files that are unique by `url` even if there are no product files associated with the specified product" do
       product.product_files.alive.each(&:mark_deleted!)
-      duplicate_file_url = "https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png"
+      duplicate_file_url = "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/pencil.png"
       another_product_file = create(:product_file, link: @other_product, url: duplicate_file_url)
       another_product.product_files << another_product_file
       create(:product_file, link: create(:product, user:), url: duplicate_file_url)
@@ -2344,7 +2344,7 @@ describe User, :vcr do
     it "returns alive product files associated with the specified product even if it not published" do
       product.update!(purchase_disabled_at: Time.current)
       product_file = product.product_files.alive.first
-      another_product_file = create(:product_file, link: @other_product, url: "https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png")
+      another_product_file = create(:product_file, link: @other_product, url: "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/pencil.png")
       another_product.product_files << another_product_file
 
       expect(product.alive?).to eq(false)
@@ -2353,8 +2353,8 @@ describe User, :vcr do
 
     it "does not include duplicate product files and prefers those product files among the duplicates that belong to the specified product" do
       product_file = product.product_files.alive.first
-      duplicate_file_url = "https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png"
-      another_duplicate_file_url = "https://s3.amazonaws.com/gumroad-specs/attachment/logo.png"
+      duplicate_file_url = "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/pencil.png"
+      another_duplicate_file_url = "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/logo.png"
       _another_product_file1 = create(:product_file, link: another_product, url: duplicate_file_url)
       duplicate_product_file = create(:product_file, link: product, url: duplicate_file_url)
       another_product_file2 = create(:product_file, link: another_product, url: another_duplicate_file_url)

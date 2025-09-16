@@ -40,7 +40,7 @@ describe("Bundle edit page", type: :system, js: true) do
     expect(page).to have_button("Unpublish", disabled: true)
     wait_for_file_embed_to_finish_uploading(name: "test")
     wait_for_ajax
-    in_preview { expect(page).to have_selector("img[src*='gumroad-specs.s3.amazonaws.com']") }
+    in_preview { expect(page).to have_selector("img[src*='gumroad-specs.s3.ap-southeast-2.amazonaws.com']") }
     in_preview { expect(page).to have_embed(name: "test") }
 
     find_field("URL", with: "").fill_in with: "bundle"
@@ -101,7 +101,7 @@ describe("Bundle edit page", type: :system, js: true) do
     expect(bundle.name).to eq("New bundle")
     public_file = bundle.alive_public_files.sole
     expect(bundle.description).to include("<p>This is a new bundle of products</p>")
-    expect(bundle.description).to include(%{<figure><img src="https://gumroad-specs.s3.amazonaws.com/#{ActiveStorage::Blob.find_by(filename: "test.jpg").key}"><p class="figcaption"></p></figure>})
+    expect(bundle.description).to include(%{<figure><img src="https://gumroad-specs.s3.ap-southeast-2.amazonaws.com/#{ActiveStorage::Blob.find_by(filename: "test.jpg").key}"><p class="figcaption"></p></figure>})
     expect(bundle.description).to include(%{<public-file-embed id="#{public_file.public_id}"></public-file-embed>})
     expect(bundle.custom_permalink).to eq("bundle")
     expect(bundle.price_cents).to eq(100)
@@ -167,8 +167,8 @@ describe("Bundle edit page", type: :system, js: true) do
             select_tab "Computer files"
           end
           wait_for_ajax
-          expect(page).to have_selector("img[src*='gumroad-specs.s3.amazonaws.com']")
-          expect(bundle.reload.display_asset_previews.alive.first.url).to match("gumroad-specs.s3.amazonaws.com")
+          expect(page).to have_selector("img[src*='gumroad-specs.s3.ap-southeast-2.amazonaws.com']")
+          expect(bundle.reload.display_asset_previews.alive.first.url).to match("gumroad-specs.s3.ap-southeast-2.amazonaws.com")
 
           select_disclosure "Add cover" do
             click_on "Upload images or videos"
@@ -177,7 +177,7 @@ describe("Bundle edit page", type: :system, js: true) do
             click_on "Upload"
           end
           wait_for_ajax
-          all("img[src*='gumroad-specs.s3.amazonaws.com']").last.hover
+          all("img[src*='gumroad-specs.s3.ap-southeast-2.amazonaws.com']").last.hover
           click_on "Show next cover"
           expect(page).to have_selector("iframe[src*='youtube.com']")
           expect(bundle.reload.display_asset_previews.alive.second.url).to match("youtube.com")

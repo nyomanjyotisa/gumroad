@@ -1596,7 +1596,7 @@ describe PurchasesController, :vcr do
       end
 
       before :each do
-        @s3_obj_public_url = "https://s3.amazonaws.com/gumroad-specs/attachment/manual.pdf"
+        @s3_obj_public_url = "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/manual.pdf"
 
         s3_obj_double = double
         allow(s3_obj_double).to receive(:presigned_url).and_return(@s3_obj_public_url)
