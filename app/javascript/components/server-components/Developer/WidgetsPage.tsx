@@ -47,73 +47,75 @@ export const WidgetsPage = ({ display_product_select, products, affiliated_produ
 
   return (
     <Layout currentPage="widgets">
-      <form>
-        <section>
-          <header>
-            <h3>Share your product</h3>
-            <p>
-              You can easily bring the Gumroad purchase page right into your site, without directing your buyers
-              elsewhere.{" "}
-              <a href="/help/article/44-build-gumroad-into-your-website" target="_blank" rel="noreferrer">
-                Learn more
-              </a>
-            </p>
-          </header>
-          <div>
-            <Widgets
-              display_product_select={display_product_select}
-              products={products}
-              affiliated_products={affiliated_products}
-              default_product={default_product}
-            />
-          </div>
-        </section>
-        {currentSeller ? (
+      <div className="p-4 md:p-8">
+        <form>
           <section>
             <header>
-              <h3>Subscribe form</h3>
+              <h3>Share your product</h3>
               <p>
-                Share your subscribe form on any website or blog using an embed or URL.{" "}
-                <a href="/help/article/170-audience" target="_blank" rel="noreferrer">
+                You can easily bring the Gumroad purchase page right into your site, without directing your buyers
+                elsewhere.{" "}
+                <a href="/help/article/44-build-gumroad-into-your-website" target="_blank" rel="noreferrer">
                   Learn more
                 </a>
               </p>
             </header>
-            <fieldset>
-              <legend>
-                <label htmlFor={copyButtonUID}>Share your subscribe page and grow your audience</label>
-              </legend>
-              <CopyToClipboard
-                text={Routes.custom_domain_subscribe_url({ host: currentSeller.subdomain })}
-                copyTooltip="Copy link"
-                tooltipPosition="bottom"
-              >
-                <Button id={copyButtonUID} color="primary">
-                  <Icon name="link" />
-                  Copy link
-                </Button>
-              </CopyToClipboard>
-            </fieldset>
-            <fieldset>
-              <legend>
-                <label htmlFor={FOLLOW_FORM_EMBED_INPUT_ID}>Test your subscribe form with your email</label>
-              </legend>
-              <FollowFormEmbed sellerId={currentSeller.id} preview />
-            </fieldset>
-            <fieldset>
-              <legend>
-                <label htmlFor={followFormEmbedUID}>Subscribe form embed code</label>
-                <CopyToClipboard text={followFormEmbedHTML} copyTooltip="Copy to Clipboard" tooltipPosition="top">
-                  <button type="button" className="link">
-                    Copy embed code
-                  </button>
-                </CopyToClipboard>
-              </legend>
-              <textarea id={followFormEmbedUID} value={followFormEmbedHTML} readOnly />
-            </fieldset>
+            <div>
+              <Widgets
+                display_product_select={display_product_select}
+                products={products}
+                affiliated_products={affiliated_products}
+                default_product={default_product}
+              />
+            </div>
           </section>
-        ) : null}
-      </form>
+          {currentSeller ? (
+            <section>
+              <header>
+                <h3>Subscribe form</h3>
+                <p>
+                  Share your subscribe form on any website or blog using an embed or URL.{" "}
+                  <a href="/help/article/170-audience" target="_blank" rel="noreferrer">
+                    Learn more
+                  </a>
+                </p>
+              </header>
+              <fieldset>
+                <legend>
+                  <label htmlFor={copyButtonUID}>Share your subscribe page and grow your audience</label>
+                </legend>
+                <CopyToClipboard
+                  text={Routes.custom_domain_subscribe_url({ host: currentSeller.subdomain })}
+                  copyTooltip="Copy link"
+                  tooltipPosition="bottom"
+                >
+                  <Button id={copyButtonUID} color="primary">
+                    <Icon name="link" />
+                    Copy link
+                  </Button>
+                </CopyToClipboard>
+              </fieldset>
+              <fieldset>
+                <legend>
+                  <label htmlFor={FOLLOW_FORM_EMBED_INPUT_ID}>Test your subscribe form with your email</label>
+                </legend>
+                <FollowFormEmbed sellerId={currentSeller.id} preview />
+              </fieldset>
+              <fieldset>
+                <legend>
+                  <label htmlFor={followFormEmbedUID}>Subscribe form embed code</label>
+                  <CopyToClipboard text={followFormEmbedHTML} copyTooltip="Copy to Clipboard" tooltipPosition="top">
+                    <button type="button" className="link">
+                      Copy embed code
+                    </button>
+                  </CopyToClipboard>
+                </legend>
+                <textarea id={followFormEmbedUID} value={followFormEmbedHTML} readOnly />
+              </fieldset>
+            </section>
+          ) : null}
+        </form>
+      </div>
     </Layout>
   );
 };
