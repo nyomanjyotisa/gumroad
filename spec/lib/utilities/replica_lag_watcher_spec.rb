@@ -96,10 +96,10 @@ describe ReplicaLagWatcher do
     end
 
     it "sets connections if they weren't set before" do
-      stub_const("REPLICAS_HOSTS", ["web-replica-1.aaaaaa.us-east-1.rds.amazonaws.com"])
+      stub_const("REPLICAS_HOSTS", ["web-replica-1.aaaaaa.ap-southeast-2.rds.amazonaws.com"])
       connection_double = double
       expect(Mysql2::Client).to receive(:new).with(
-        host: "web-replica-1.aaaaaa.us-east-1.rds.amazonaws.com",
+        host: "web-replica-1.aaaaaa.ap-southeast-2.rds.amazonaws.com",
         username: ActiveRecord::Base.connection_db_config.configuration_hash[:username],
         password: ActiveRecord::Base.connection_db_config.configuration_hash[:password],
         database: ActiveRecord::Base.connection_db_config.configuration_hash[:database],
