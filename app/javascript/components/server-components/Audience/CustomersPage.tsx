@@ -51,6 +51,7 @@ import {
   formatPriceCentsWithoutCurrencySymbol,
 } from "$app/utils/currency";
 import { formatCallDate } from "$app/utils/date";
+import { isValidEmail } from "$app/utils/email";
 import FileUtils from "$app/utils/file";
 import { asyncVoid } from "$app/utils/promise";
 import { RecurrenceId, recurrenceLabels } from "$app/utils/recurringPricing";
@@ -74,6 +75,7 @@ import { ReviewVideoPlayer } from "$app/components/ReviewVideoPlayer";
 import { Select } from "$app/components/Select";
 import { showAlert } from "$app/components/server-components/Alert";
 import { Toggle } from "$app/components/Toggle";
+import { PageHeader } from "$app/components/ui/PageHeader";
 import { useDebouncedCallback } from "$app/components/useDebouncedCallback";
 import { useOnChange } from "$app/components/useOnChange";
 import { useUserAgentInfo } from "$app/components/UserAgent";
@@ -244,11 +246,12 @@ const CustomersPage = ({
   const timeZoneAbbreviation = format(new Date(), "z", { timeZone: currentSeller.timeZone.name });
 
   return (
-    <main className="h-full">
-      <header>
-        <h1>Sales</h1>
-        {(customers.length > 0 || searchQuery !== null) && (
-          <div className="actions">
+    <div className="h-full">
+      <PageHeader
+        title="Sales"
+        actions={
+          (customers.length > 0 || searchQuery !== null) && (
+            <>
             <Popover
               aria-label="Search"
               onToggle={() => searchInputRef.current?.focus()}
@@ -425,10 +428,11 @@ const CustomersPage = ({
                 )}
               </div>
             </Popover>
-          </div>
-        )}
-      </header>
-      <section className="paragraphs">
+            </>
+          )
+        }
+      />
+      <section className="p-4 md:p-8">
         {customers.length > 0 ? (
           <>
             <table aria-live="polite" aria-busy={isLoading}>
@@ -583,7 +587,7 @@ const CustomersPage = ({
           />
         ) : null}
       </section>
-    </main>
+    </div>
   );
 };
 
@@ -1525,6 +1529,15 @@ const EmailSection = ({
 
   const handleSave = async () => {
     if (!onSave) return;
+
+    const emailError =
+      email.length === 0 ? "Email must be provided" : !isValidEmail(email) ? "Please enter a valid email" : null;
+
+    if (emailError) {
+      showAlert(emailError, "error");
+      return;
+    }
+
     setIsLoading(true);
     await onSave(email);
     setIsLoading(false);
