@@ -96,6 +96,29 @@ describe("Checkout upsells page", type: :system, js: true) do
       end
     end
 
+    it "displays 'All products' for universal upsells" do
+      create(:upsell,
+             product: product1,
+             variant: product1.alive_variants.second,
+             name: "Universal Upsell",
+             seller: seller,
+             cross_sell: true,
+             universal: true,
+             offer_code: create(:offer_code, user: seller, products: [product1])
+      )
+
+      visit checkout_upsells_path
+
+      upsell_row = find(:table_row, { "Upsell" => "Universal Upsell" })
+      upsell_row.click
+
+      within_section "Universal Upsell", section_element: :aside do
+        within_section "Selected products" do
+          expect(page).to have_content("All productss")
+        end
+      end
+    end
+
     context "when the creator has no upsells" do
       it "displays a placeholder message" do
         login_as create(:user)
