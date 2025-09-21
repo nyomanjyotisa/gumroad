@@ -120,7 +120,10 @@ describe("Checkout upsells page", type: :system, js: true) do
     end
 
     describe "sorting and pagination" do
-      before { stub_const("Checkout::UpsellsController::PER_PAGE", 1) }
+      before do
+        stub_const("Checkout::UpsellsController::PER_PAGE", 1)
+        universal_upsell.destroy!
+      end
 
       it "sorts and paginates the upsells" do
         visit checkout_upsells_path
