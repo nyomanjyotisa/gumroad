@@ -736,11 +736,12 @@ const CustomerDrawer = ({
       getCharges(customer.id, customer.email)
         .then((charges) => {
           setCharges(charges);
-          setIsLoadingCharges(false);
         })
         .catch((e: unknown) => {
           assertResponseError(e);
           showAlert(e.message, "error");
+        })
+        .finally(() => {
           setIsLoadingCharges(false);
         });
     }
@@ -1181,7 +1182,7 @@ const CustomerDrawer = ({
           showRefundFeeNotice={showRefundFeeNotice}
           canPing={canPing}
           customerEmail={customer.email}
-          isLoadingCharges={isLoadingCharges}
+          loading={isLoadingCharges}
         />
       ) : null}
       {commission ? (
@@ -2323,7 +2324,7 @@ const ChargesSection = ({
   showRefundFeeNotice,
   canPing,
   customerEmail,
-  isLoadingCharges,
+  loading,
 }: {
   charges: Charge[];
   remainingCharges: number | null;
@@ -2331,7 +2332,7 @@ const ChargesSection = ({
   showRefundFeeNotice: boolean;
   canPing: boolean;
   customerEmail: string;
-  isLoadingCharges: boolean;
+  loading: boolean;
 }) => {
   const updateCharge = (id: string, update: Partial<Charge>) =>
     onChange(charges.map((charge) => (charge.id === id ? { ...charge, ...update } : charge)));
@@ -2341,9 +2342,9 @@ const ChargesSection = ({
       <header>
         <h3>Charges</h3>
       </header>
-      {isLoadingCharges ? (
+      {loading ? (
         <section>
-          <div style={{ textAlign: "center" }}>
+          <div className="text-center">
             <Progress width="2em" />
           </div>
         </section>
@@ -2369,7 +2370,7 @@ const ChargesSection = ({
         </>
       ) : (
         <section>
-          <div style={{ textAlign: "center" }}>No charges recorded yet</div>
+          <div>No charges yet</div>
         </section>
       )}
     </section>
