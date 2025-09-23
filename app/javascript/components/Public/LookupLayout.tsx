@@ -1,5 +1,5 @@
 import cx from "classnames"
-import React from "react"
+import React, { useEffect, useRef } from "react"
 
 import { lookupCharges, lookupPaypalCharges } from "$app/data/charge"
 import { assertResponseError } from "$app/utils/request"
@@ -16,6 +16,7 @@ const LookupLayout = ({ children, title, type }: {
   const [invoiceId, setInvoiceId] = React.useState<{ value: string; error?: boolean }>({ value: "" })
   const [isLoading, setIsLoading] = React.useState(false)
   const [success, setSuccess] = React.useState<boolean | null>(null)
+  const messageRef = useRef<HTMLDivElement>(null)
 
   const handleCardLookup = async () => {
     let hasError = false;
@@ -67,6 +68,15 @@ const LookupLayout = ({ children, title, type }: {
     }
   }
 
+  useEffect(() => {
+    if (success !== null && messageRef.current) {
+      messageRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }, [success]);
+
   return (
     <div>
       <header>
@@ -74,7 +84,7 @@ const LookupLayout = ({ children, title, type }: {
       </header>
       <div>
         {success !== null && (
-          <div style={{ marginBottom: "var(--spacer-7)" }}>
+          <div ref={messageRef} style={{ marginBottom: "var(--spacer-7)" }}>
             {success ? (
               <div className="success" role="status">
                 We were able to find a match! It has been emailed to you. Sorry about the inconvenience.

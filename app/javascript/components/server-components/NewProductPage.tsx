@@ -384,7 +384,10 @@ const NewProductPage = ({
                     placeholder="Price your product"
                     value={price}
                     onChange={(e) => {
-                      setPrice(e.target.value);
+                      let newValue = e.target.value;
+                      newValue = newValue.replace(/[.,]+/gu, ".");
+                      newValue = newValue.replace(/[^0-9.]/gu, "");
+                      setPrice(newValue);
                       errors.delete("price");
                     }}
                     autoComplete="off"
