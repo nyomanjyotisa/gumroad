@@ -997,11 +997,28 @@ describe Settings::PaymentsController, :vcr do
         expect(response.parsed_body["error_message"]).to eq("Email address cannot contain non-ASCII characters")
       end
 
+      it "fails if bank payouts are supported in seller's country" do
+        put :update, xhr: true, params: { payment_address: "sebastian@example.com" }
+
+        expect(response.parsed_body["success"]).to be(false)
+        expect(response.parsed_body["error_message"]).to eq("PayPal payouts are not supported in your country.")
+      end
+
+      it "succeeds if bank payouts are not supported in seller's country" do
+        user.alive_user_compliance_info.dup_and_save { |nuci| nuci.country = "Brazil" }
+
+        put :update, xhr: true, params: { payment_address: "sebastian@example.com" }
+
+        expect(response.parsed_body["success"]).to be(true)
+        expect(user.reload.payment_address).to eq("sebastian@example.com")
+      end
+
       it "resumes payouts if account is not flagged or suspended" do
         user.update!(payment_address: "")
         stripe_account = create(:merchant_account_stripe, user: user)
         create(:user_compliance_info_request, user: user, field_needed: UserComplianceInfoFields::Individual::TAX_ID)
-        user.update!(payouts_paused_internally: true)
+        user.update!(payouts_paused_internally: true, payouts_paused_by: User::PAYOUT_PAUSE_SOURCE_STRIPE)
+        user.alive_user_compliance_info.dup_and_save { |nuci| nuci.country = "Brazil" }
 
         put :update, xhr: true, params: { payment_address: "sebastian@example.com" }
 
@@ -1009,6 +1026,8 @@ describe Settings::PaymentsController, :vcr do
         expect(stripe_account.reload.alive?).to be false
         expect(user.user_compliance_info_requests.requested.count).to eq(0)
         expect(user.payouts_paused_internally?).to be false
+        expect(user.payouts_paused_by).to be nil
+        expect(user.payouts_paused_by_source).to be nil
       end
 
       it "does not resume payouts if account is flagged or suspended" do
@@ -1016,6 +1035,7 @@ describe Settings::PaymentsController, :vcr do
         stripe_account = create(:merchant_account_stripe, user: user)
         create(:user_compliance_info_request, user: user, field_needed: UserComplianceInfoFields::Individual::TAX_ID)
         user.update!(payouts_paused_internally: true)
+        user.alive_user_compliance_info.dup_and_save { |nuci| nuci.country = "Brazil" }
 
         put :update, xhr: true, params: { payment_address: "sebastian@example.com" }
 

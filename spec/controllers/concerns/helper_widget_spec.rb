@@ -21,13 +21,13 @@ describe HelperWidget, type: :controller do
   end
 
   describe "#helper_widget_host" do
-    it "returns the default host when environment variable is not set" do
-      expect(ENV["HELPER_WIDGET_HOST"]).to be_nil
-      expect(controller.helper_widget_host).to eq("https://help.gumroad.com")
+    it "returns nil when config is not set" do
+      allow(GlobalConfig).to receive(:get).with("HELPER_WIDGET_HOST").and_return(nil)
+      expect(controller.helper_widget_host).to be_nil
     end
 
-    it "returns the environment variable value when set" do
-      allow(ENV).to receive(:fetch).with("HELPER_WIDGET_HOST", "https://help.gumroad.com").and_return("https://custom.helper.ai")
+    it "returns the config value when set" do
+      allow(GlobalConfig).to receive(:get).with("HELPER_WIDGET_HOST").and_return("https://custom.helper.ai")
       expect(controller.helper_widget_host).to eq("https://custom.helper.ai")
     end
   end
@@ -37,16 +37,12 @@ describe HelperWidget, type: :controller do
       expect(controller.helper_session).to be_nil
     end
 
-    it "returns email, emailHash, timestamp, and customerMetadata when signed in" do
+    it "returns email, emailHash and timestamp when signed in" do
       sign_in(seller)
 
       fixed_time = Time.zone.parse("2024-01-01 00:00:00 UTC")
       allow(Time).to receive(:current).and_return(fixed_time)
       timestamp_ms = (fixed_time.to_f * 1000).to_i
-
-      metadata = { name: "Test User", email: seller.email, value: 123 }
-      service_double = instance_double(HelperUserInfoService, metadata: metadata)
-      allow(HelperUserInfoService).to receive(:new).with(email: seller.email).and_return(service_double)
 
       expected_hmac = OpenSSL::HMAC.hexdigest("sha256", "test_secret", "#{seller.email}:#{timestamp_ms}")
 
@@ -55,7 +51,6 @@ describe HelperWidget, type: :controller do
       expect(session[:email]).to eq(seller.email)
       expect(session[:emailHash]).to eq(expected_hmac)
       expect(session[:timestamp]).to eq(timestamp_ms)
-      expect(session[:customerMetadata]).to eq(metadata)
     end
   end
 end

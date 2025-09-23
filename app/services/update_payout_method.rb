@@ -169,17 +169,16 @@ class UpdatePayoutMethod
 
       return { error: :provide_valid_email_prompt } unless EmailFormatValidator.valid?(payment_address)
       return { error: :provide_ascii_only_email_prompt } unless payment_address.ascii_only?
+      return { error: :paypal_payouts_not_supported } if user.alive_user_compliance_info.blank? || user.native_payouts_supported?
 
       user.payment_address = payment_address
       user.save!
 
-      if user.stripe_account.present? && user.unpaid_balances.where(merchant_account_id: user.stripe_account.id).present?
-        user.transfer_stripe_balance_to_gumroad_account!
-      end
+      user.forfeit_unpaid_balance!(:payout_method_change)
       user.stripe_account&.delete_charge_processor_account!
       user.active_bank_account&.mark_deleted!
       user.user_compliance_info_requests.requested.find_each(&:mark_provided!)
-      user.update!(payouts_paused_internally: false) if user.payouts_paused_internally? && !user.flagged? && !user.suspended?
+      user.update!(payouts_paused_internally: false, payouts_paused_by: nil) if user.payouts_paused_by_source == User::PAYOUT_PAUSE_SOURCE_STRIPE && !user.flagged? && !user.suspended?
 
       CheckPaymentAddressWorker.perform_async(user.id)
     end

@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { assertDefined } from "$app/utils/assert";
+import { classNames } from "$app/utils/classNames";
 import { assertResponseError, request, ResponseError } from "$app/utils/request";
 
 import { NavigationButton } from "$app/components/Button";
@@ -118,9 +119,13 @@ const SectionEditor = ({
     <SectionReducerContext.Provider value={reducer}>
       <ImageUploadSettingsContext.Provider value={imageUploadSettings}>
         {sections.map((section, i) => (
-          <section key={section.id} id={section.id}>
+          <section key={section.id} id={section.id} className="border-b border-border px-4 py-8 lg:py-16">
             <AddSectionButton index={i} />
-            {section.id ? <EditSection section={section} /> : children}
+            {section.id ? (
+              <EditSection section={section} />
+            ) : (
+              <div className="mx-auto w-full max-w-6xl">{children}</div>
+            )}
             {i === sections.length - 1 ? <AddSectionButton index={i + 1} position="top" /> : null}
           </section>
         ))}
@@ -159,7 +164,11 @@ export const Layout = (
     </>
   );
 
-  const mainSection = <section>{productView}</section>;
+  const mainSection = (
+    <section className={classNames("border-b border-border lg:py-16", props.sections.length > 0 ? "px-4 py-8" : "p-4")}>
+      {productView}
+    </section>
+  );
 
   return (
     <>
@@ -223,16 +232,6 @@ const CtaBar = ({
     new IntersectionObserver(
       ([entry]) => {
         if (!entry) return;
-        // @ts-expect-error: Fixes issue on Safari where the page gets scrolled up/down by the height of the CTA bar when it disappears/appears, resulting on an infinite loop of the CTA bar being shown/hidden.
-        if (window.safari !== undefined && isDesktop) {
-          const main = document.querySelector("main");
-          if (ref.current && ctaButtonRef.current && main && entry.rootBounds) {
-            if (entry.boundingClientRect.top < main.getBoundingClientRect().top)
-              // We use 1.9 here (instead of 2) because it empirically does a better job of eliminating
-              // the infinite scroll jumping described above.
-              main.scrollBy(0, ((entry.isIntersecting ? -1 : 1) * entry.boundingClientRect.height) / 1.9);
-          }
-        }
 
         setVisible(!entry.isIntersecting);
       },
@@ -258,9 +257,11 @@ const CtaBar = ({
         boxShadow: visible
           ? "0 var(--border-width) rgb(var(--color)), 0 calc(-1 * var(--border-width)) rgb(var(--color))"
           : undefined,
-        position: "sticky",
+        position: "fixed",
         top: isDesktop ? 0 : undefined,
         bottom: isDesktop ? undefined : 0,
+        left: 0,
+        right: 0,
         // Render above the product edit button
         zIndex: "var(--z-index-menubar)",
         marginTop: hasHero ? "var(--border-width)" : undefined,
@@ -321,6 +322,7 @@ const CtaBar = ({
 
 const EditButton = ({ product }: { product: Product }) => {
   const appDomain = useAppDomain();
+  const isDesktop = useIsAboveBreakpoint("lg");
 
   if (!product.can_edit) return null;
 
@@ -328,13 +330,14 @@ const EditButton = ({ product }: { product: Product }) => {
     <div
       style={{
         position: "absolute",
-        top: "var(--spacer-3)",
-        left: "var(--spacer-3)",
+        top: isDesktop ? "var(--spacer-3)" : "var(--spacer-4)",
+        right: isDesktop ? undefined : "var(--spacer-4)",
+        left: isDesktop ? "var(--spacer-3)" : undefined,
         // Render above the product `article`
         zIndex: "var(--z-index-overlay)",
       }}
     >
-      <WithTooltip tip="Edit product" position="right">
+      <WithTooltip tip="Edit product" position={isDesktop ? "right" : "left"}>
         <NavigationButton
           color="filled"
           href={Routes.edit_link_url({ id: product.permalink }, { host: appDomain })}
