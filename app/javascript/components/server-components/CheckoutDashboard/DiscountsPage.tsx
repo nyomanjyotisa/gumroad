@@ -284,35 +284,32 @@ const DiscountsPage = ({
       pages={pages}
       actions={
         <>
-          {
-            offerCodes.length > 0 ? (
-              <Popover
-                open={isSearchPopoverOpen}
-                onToggle={setIsSearchPopoverOpen}
-                aria-label="Search"
-                trigger={
-                  <div className="button">
-                    <Icon name="solid-search" />
-                  </div>
-                }
-              >
-                <div className="input">
+          {offerCodes.length > 0 ? (
+            <Popover
+              open={isSearchPopoverOpen}
+              onToggle={setIsSearchPopoverOpen}
+              aria-label="Search"
+              trigger={
+                <div className="button">
                   <Icon name="solid-search" />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="Search"
-                    value={searchQuery ?? ""}
-                    onChange={(evt) => {
-                      setSearchQuery(evt.target.value);
-                      debouncedLoadDiscounts();
-                    }}
-                  />
                 </div>
-              </Popover>
-              ):
-              null
-          }
+              }
+            >
+              <div className="input">
+                <Icon name="solid-search" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search"
+                  value={searchQuery ?? ""}
+                  onChange={(evt) => {
+                    setSearchQuery(evt.target.value);
+                    debouncedLoadDiscounts();
+                  }}
+                />
+              </div>
+            </Popover>
+          ) : null}
 
           <Button
             color="accent"
