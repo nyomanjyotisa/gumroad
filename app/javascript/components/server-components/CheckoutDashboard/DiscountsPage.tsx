@@ -427,7 +427,8 @@ const DiscountsPage = ({
                                 role="menuitem"
                                 className="danger"
                                 inert={!offerCode.can_update || isLoading}
-                                onClick={asyncVoid(async () => {
+                                onClick={asyncVoid(async (e) => {
+                                  e.stopPropagation();
                                   try {
                                     setIsLoading(true);
                                     setPopoverOfferCodeId(null);
