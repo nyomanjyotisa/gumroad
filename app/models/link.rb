@@ -1426,7 +1426,7 @@ class Link < ApplicationRecord
     end
 
     def alive_category_variants_presence
-      return if deleted_at.present?
+      return if deleted_at.present? || archived_changed?
 
       has_alive_categories_without_variants = variant_categories.alive.left_joins(:alive_variants).where(base_variants: { id: nil }).exists?
 
