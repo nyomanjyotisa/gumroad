@@ -224,6 +224,7 @@ const CtaBar = ({
     selectionAttributes;
 
   const [visible, setVisible] = React.useState(false);
+  const [shouldAddPaddingTop, setShouldAddPaddingTop] = React.useState(false);
   const ref = React.useRef<null | HTMLDivElement>(null);
   const isDesktop = useIsAboveBreakpoint("lg");
 
@@ -234,6 +235,10 @@ const CtaBar = ({
         if (!entry) return;
 
         setVisible(!entry.isIntersecting);
+
+        if (!entry.isIntersecting && !shouldAddPaddingTop && entry.boundingClientRect.top >= 0) {
+          setShouldAddPaddingTop(true);
+        }
       },
       { threshold: 0.5 },
     ).observe(ctaButtonRef.current);
@@ -242,6 +247,13 @@ const CtaBar = ({
   const height = ref.current?.getBoundingClientRect().height ?? 0;
 
   if (product.bundle_products.length) priceCents = getStandalonePrice(product);
+
+  React.useEffect(() => {
+    const main = document.querySelector("main");
+    if (!main || !isDesktop) return;
+
+    main.style.paddingTop = shouldAddPaddingTop ? `${height}px` : "";
+  }, [shouldAddPaddingTop, height, isDesktop]);
 
   return (
     <section
