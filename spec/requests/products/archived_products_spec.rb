@@ -6,7 +6,7 @@ require "shared_examples/products_navigation"
 require "shared_examples/with_sorting_and_pagination"
 
 describe "Archived Products", type: :system, js: true do
-  let(:seller) { create(:named_seller) }
+  let(:seller) { create(:named_seller, created_at: 31.days.ago) }
 
   include_context "with switching account to user as admin for seller"
 
@@ -211,6 +211,26 @@ describe "Archived Products", type: :system, js: true do
 
         expect(page).to have_current_path(products_path)
       end
+    end
+
+    it "unarchives a call product without duration variants" do
+      call_product = create(:call_product, durations: [], user: seller, name: "Call Product", archived: true)
+
+      visit(products_archived_index_path)
+
+      within find(:table_row, { "Name" => call_product.name }) do
+        select_disclosure "Open product action menu" do
+          click_on "Unarchive"
+        end
+      end
+      wait_for_ajax
+
+      expect(page).not_to have_content(call_product.name)
+
+      find(:tab_button, "All products").click
+
+      expect(page).to have_content(call_product.name)
+      expect(call_product.reload).not_to be_archived
     end
   end
 end

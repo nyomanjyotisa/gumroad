@@ -701,25 +701,5 @@ describe "Products Page Scenario", type: :system, js: true do
       expect(page).to have_content(call_product.name)
       expect(call_product.reload).to be_archived
     end
-
-    it "unarchives a call product without duration variants" do
-      call_product = create(:call_product, durations: [], user: seller, name: "Call Product", archived: true)
-
-      visit(products_path)
-      find(:tab_button, "Archived").click
-
-      within find_product_row(call_product) do
-        select_disclosure "Open product action menu" do
-          click_on "Unarchive"
-        end
-      end
-      wait_for_ajax
-
-      expect(page).not_to have_tab_button("Archived")
-      find(:tab_button, "All products").click
-
-      expect(page).to have_content(call_product.name)
-      expect(call_product.reload).not_to be_archived
-    end
   end
 end
