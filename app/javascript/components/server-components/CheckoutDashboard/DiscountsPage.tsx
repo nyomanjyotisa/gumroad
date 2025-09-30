@@ -326,7 +326,7 @@ const DiscountsPage = ({
     >
       <section className="p-4 md:p-8">
         {offerCodes.length > 0 ? (
-          <>
+          <section className="paragraphs">
             <table aria-live="polite" aria-busy={isLoading}>
               <thead>
                 <tr>
@@ -458,7 +458,7 @@ const DiscountsPage = ({
                 pagination={pagination}
               />
             ) : null}
-          </>
+          </section>
         ) : (
           <div className="placeholder">
             <figure>
