@@ -146,6 +146,14 @@ const ProductEligibilitySection = ({
     error: null,
   });
 
+  const errorRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (result.error && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [result.error]);
+
   return (
     <section className="!p-4 md:!p-8">
       <header>
@@ -239,7 +247,7 @@ const ProductEligibilitySection = ({
         </div>
       ) : null}
       {result.error ? (
-        <div role="alert" className={result.error.type}>
+        <div ref={errorRef} role="alert" className={result.error.type}>
           {result.error.message}
         </div>
       ) : null}
