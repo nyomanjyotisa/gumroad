@@ -649,7 +649,7 @@ const ExistingPurchaseStack = ({
               <h5>{purchase.membership.tier_name}</h5>
               {purchase.total_price_including_tax_and_shipping}
             </div>
-            <div>
+            <div className="flex-col *:w-full sm:flex-row">
               <NavigationButton
                 href={purchase.membership.manage_url}
                 target="_blank"
