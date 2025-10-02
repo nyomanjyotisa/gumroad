@@ -17,6 +17,15 @@ describe("Password Settings Scenario", type: :system, js: true) do
       login_as user
     end
 
+    it "shows 'Add password' UI elements when setting password for the first time" do
+      visit settings_password_path
+
+      expect(page).to have_css("h2", text: "Add password")
+      expect(page).to have_button("Add password")
+      expect(page).to have_field("Add password")
+      expect(page).not_to have_field("Old password")
+    end
+
     it "doesn't allow setting a new password with a value that was found in the password breaches" do
       visit settings_password_path
 
@@ -29,7 +38,7 @@ describe("Password Settings Scenario", type: :system, js: true) do
       vcr_turned_on do
         VCR.use_cassette("Add Password-with a compromised password") do
           with_real_pwned_password_check do
-            click_on("Change password")
+            click_on("Add password")
             wait_for_ajax
           end
         end
@@ -50,7 +59,7 @@ describe("Password Settings Scenario", type: :system, js: true) do
       vcr_turned_on do
         VCR.use_cassette("Add Password-with a not compromised password") do
           with_real_pwned_password_check do
-            click_on("Change password")
+            click_on("Add password")
             wait_for_ajax
           end
         end
@@ -65,6 +74,15 @@ describe("Password Settings Scenario", type: :system, js: true) do
 
     before(:each) do
       login_as user
+    end
+
+    it "shows 'Change password' UI elements when updating existing password" do
+      visit settings_password_path
+
+      expect(page).to have_css("h2", text: "Change password")
+      expect(page).to have_button("Change password")
+      expect(page).to have_field("Old password")
+      expect(page).to have_field("New password")
     end
 
     it "validates the new password length" do

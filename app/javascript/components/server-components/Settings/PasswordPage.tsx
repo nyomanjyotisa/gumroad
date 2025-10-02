@@ -58,7 +58,7 @@ const PasswordPage = (props: Props) => {
       >
         <section className="!p-4 md:!p-8">
           <header>
-            <h2>Change password</h2>
+            <h2>{requireOldPassword ? "Change password" : "Add password"}</h2>
           </header>
           {requireOldPassword ? (
             <fieldset>
@@ -87,7 +87,13 @@ const PasswordPage = (props: Props) => {
           <fieldset>
             <div>
               <Button type="submit" color="accent" disabled={isSaving}>
-                {isSaving ? "Changing..." : "Change password"}
+                {isSaving
+                  ? requireOldPassword
+                    ? "Changing..."
+                    : "Adding..."
+                  : requireOldPassword
+                    ? "Change password"
+                    : "Add password"}
               </Button>
             </div>
           </fieldset>
