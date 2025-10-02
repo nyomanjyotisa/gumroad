@@ -1944,7 +1944,7 @@ const LicenseSection = ({ license, onSave }: { license: License; onSave: (enable
         <h3>License key</h3>
       </header>
       <div>
-        <pre>
+        <pre className="whitespace-pre-wrap">
           <code>{license.key}</code>
         </pre>
       </div>
