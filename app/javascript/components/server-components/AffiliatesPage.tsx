@@ -270,7 +270,9 @@ const AffiliateRequestsTable = ({
                   <small>{affiliateRequest.email}</small>
                 </td>
 
-                <td data-label="Promotion">{affiliateRequest.promotion}</td>
+                <td data-label="Promotion">
+                  <pre className="whitespace-pre-wrap">{affiliateRequest.promotion}</pre>
+                </td>
 
                 <td data-label="Date">{parseISO(affiliateRequest.date).toLocaleDateString(userAgentInfo.locale)}</td>
 
