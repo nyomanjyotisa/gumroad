@@ -4,6 +4,7 @@ require "spec_helper"
 
 describe "Coffee", type: :system, js: true do
   let(:seller) { create(:named_seller, :eligible_for_service_products) }
+  let(:other_user) { create(:user) }
   let(:coffee) do
     create(
       :product,
@@ -136,6 +137,22 @@ describe "Coffee", type: :system, js: true do
       expect(page).to have_selector("h1", text: "Buy me a coffee!")
       expect(page).to have_link("test@example.com", href: "mailto:test@example.com")
       expect(page).not_to have_text('<a href="mailto:test@example.com"')
+    end
+  end
+
+  context "edit button" do
+    it "shows edit button to product owner" do
+      sign_in seller
+      visit coffee.long_url
+
+      expect(page).to have_selector("[aria-label='Edit product']")
+    end
+
+    it "does not show edit button to other users" do
+      sign_in other_user
+      visit coffee.long_url
+
+      expect(page).to_not have_selector("[aria-label='Edit product']")
     end
   end
 end

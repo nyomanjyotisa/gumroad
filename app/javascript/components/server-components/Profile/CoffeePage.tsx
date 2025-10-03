@@ -4,13 +4,18 @@ import { createCast } from "ts-safe-cast";
 import { CreatorProfile } from "$app/parsers/profile";
 import { register } from "$app/utils/serverComponentUtil";
 
+import { NavigationButton } from "$app/components/Button";
+import { useAppDomain } from "$app/components/DomainSettings";
+import { Icon } from "$app/components/Icons";
 import { Product, Props as ProductProps, Purchase } from "$app/components/Product";
 import { ConfigurationSelector, PriceSelection } from "$app/components/Product/ConfigurationSelector";
 import { CtaButton, getCtaName } from "$app/components/Product/CtaButton";
 import { Layout as ProfileLayout } from "$app/components/Profile/Layout";
 import { showAlert } from "$app/components/server-components/Alert";
+import { useIsAboveBreakpoint } from "$app/components/useIsAboveBreakpoint";
 import { useOriginalLocation } from "$app/components/useOriginalLocation";
 import { useRunOnce } from "$app/components/useRunOnce";
+import { WithTooltip } from "$app/components/WithTooltip";
 
 type Props = ProductProps & {
   creator_profile: CreatorProfile;
@@ -76,8 +81,25 @@ export const CoffeeProduct = ({
       />
     </>
   );
+
+  const isDesktop = useIsAboveBreakpoint("lg");
+  const appDomain = useAppDomain();
+
   return (
     <section className="px-4" style={{ display: "grid", gap: "var(--spacer-7)", alignContent: "center", flexGrow: 1 }}>
+      {product.can_edit ? (
+        <div className="!fixed right-3 top-5 z-30 !p-0 lg:left-3 lg:right-auto lg:top-3">
+          <WithTooltip tip="Edit product" position={isDesktop ? "right" : "left"}>
+            <NavigationButton
+              color="filled"
+              href={Routes.edit_link_url({ id: product.permalink }, { host: appDomain })}
+              aria-label="Edit product"
+            >
+              <Icon name="pencil" />
+            </NavigationButton>
+          </WithTooltip>
+        </div>
+      ) : null}
       <section className="override grid gap-8">
         <h1>{product.name}</h1>
         {product.description_html ? <h3 dangerouslySetInnerHTML={{ __html: product.description_html }} /> : null}
