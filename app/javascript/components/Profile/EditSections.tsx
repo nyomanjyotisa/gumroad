@@ -357,7 +357,7 @@ const ProductsSettings = ({ section }: { section: ProductsSection }) => {
               <label role="listitem" key={product.id} style={{ border: product.chosen ? "var(--border)" : undefined }}>
                 <div className="content">
                   {section.default_product_sort === "page_layout" ? <div aria-grabbed={product.chosen} /> : null}
-                  <span className="text-singleline">{product.name}</span>
+                  <span className="line-clamp-3">{product.name}</span>
                 </div>
                 <div className="actions">
                   <input
