@@ -149,7 +149,7 @@ const UtmLinkList = () => {
       }
     >
       {navigation.state === "loading" && utmLinks.length === 0 ? (
-        <div style={{ justifySelf: "center" }}>
+        <div className="flex justify-center p-4 md:p-8">
           <Progress width="5rem" />
         </div>
       ) : utmLinks.length > 0 ? (
