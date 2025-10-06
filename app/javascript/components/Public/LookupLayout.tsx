@@ -81,7 +81,7 @@ const LookupLayout = ({ children, title, type }: {
 
   return (
     <div>
-      <PageHeader title={title} />
+      <PageHeader title={title} className="border-b-0 sm:border-b" />
       <div>
         {success !== null && (
           <div ref={messageRef} className="!p-4 md:!p-8">
