@@ -221,7 +221,7 @@ class LinksController < ApplicationController
     on_profile = search_params[:user_id].present?
     if on_profile
       user = User.find_by_external_id(search_params[:user_id])
-      section = user && user.seller_profile_products_sections.on_profile.find_by_external_id(search_params[:section_id])
+      section = user && user.seller_profile_products_sections.find_by_external_id(search_params[:section_id])
       return render json: { total: 0, filetypes_data: [], tags_data: [], products: [] } if section.nil?
       search_params[:section] = section
       search_params[:is_alive_on_profile] = true
