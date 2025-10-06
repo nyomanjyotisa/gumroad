@@ -44,6 +44,7 @@ import { buildStaticRouter, GlobalProps, register } from "$app/utils/serverCompo
 import { isUrlValid } from "$app/utils/url";
 
 import { AffiliateSignupForm, ProductRow } from "$app/components/AffiliatesDashboard/AffiliateSignupForm";
+import { Breaklines } from "$app/components/Breaklines";
 import { Button } from "$app/components/Button";
 import { CopyToClipboard } from "$app/components/CopyToClipboard";
 import { Icon } from "$app/components/Icons";
@@ -271,7 +272,7 @@ const AffiliateRequestsTable = ({
                 </td>
 
                 <td data-label="Promotion">
-                  <pre className="whitespace-pre-wrap">{affiliateRequest.promotion}</pre>
+                  <Breaklines text={affiliateRequest.promotion} />
                 </td>
 
                 <td data-label="Date">{parseISO(affiliateRequest.date).toLocaleDateString(userAgentInfo.locale)}</td>
