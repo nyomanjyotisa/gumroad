@@ -295,7 +295,7 @@ class Purchase < ApplicationRecord
     end
 
     state :successful do
-      validate { |purchase| purchase.send(:financial_transaction_validation) }
+      # validate { |purchase| purchase.send(:financial_transaction_validation) }
       # Read http://rdoc.info/github/pluginaweek/state_machine/master/StateMachine/Integrations/ActiveRecord
       # section "Validations" for why this validator is called in this way.
     end
