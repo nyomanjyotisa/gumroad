@@ -382,7 +382,9 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
           </div>
         ) : null}
         <div className="with-sidebar">
-          {!showArchivedNotice && (hasParams || archivedCount > 0 || state.results.length > 9) ? (
+          {!showArchivedNotice &&
+          (hasParams || archivedCount > 0 || state.results.length > 9) &&
+          state.results.length > 0 ? (
             <div className="stack">
               <header>
                 <div>
