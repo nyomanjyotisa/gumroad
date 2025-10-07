@@ -381,7 +381,8 @@ const DiscountsPage = ({
                         <div className="override grid grid-cols-[min-content_1fr] gap-2">
                           {validAt && currentDate < validAt ? (
                             <>Scheduled</>
-                          ) : expiresAt && currentDate > expiresAt ? (
+                          ) : (expiresAt && currentDate > expiresAt) ||
+                            (statistics && offerCode.limit && statistics.uses.total >= offerCode.limit) ? (
                             <>Expired</>
                           ) : (
                             <>Live</>

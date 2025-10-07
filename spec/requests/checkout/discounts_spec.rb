@@ -880,6 +880,30 @@ describe("Checkout discounts page", type: :system, js: true) do
     end
   end
 
+  describe "discount status updates when usage limit is reached" do
+    let!(:limited_offer) { create(:offer_code, name: "Limited Discount", code: "LIMITED1", user: seller, max_purchase_count: 1, amount_cents: 100) }
+
+    it "changes status from Live to Expired when usage limit is reached" do
+      visit checkout_discounts_path
+
+      within find(:table_row, { "Discount" => "Limited Discount" }) do
+        expect(page).to have_text("$1 off")
+        expect(page).to have_text("0/1")
+        expect(page).to have_text("Live")
+      end
+
+      create(:purchase, link: product1, offer_code: limited_offer)
+
+      visit checkout_discounts_path
+
+      within find(:table_row, { "Discount" => "Limited Discount" }) do
+        expect(page).to have_text("$1 off")
+        expect(page).to have_text("1/1")
+        expect(page).to have_text("Expired")
+      end
+    end
+  end
+
   describe "searching" do
     before do
       create(:offer_code, user: seller, name: "Discount 4", code: "discount4", universal: true)
