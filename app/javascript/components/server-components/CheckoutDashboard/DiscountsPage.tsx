@@ -326,7 +326,7 @@ const DiscountsPage = ({
     >
       <section className="p-4 md:p-8">
         {offerCodes.length > 0 ? (
-          <>
+          <section className="paragraphs">
             <table aria-live="polite" aria-busy={isLoading}>
               <thead>
                 <tr>
@@ -351,7 +351,7 @@ const DiscountsPage = ({
                       onClick={() => setSelectedOfferCodeId(offerCode.id)}
                     >
                       <td>
-                        <div className="grid gap-2">
+                        <div className="override grid gap-2">
                           <div>
                             <div className="pill small mr-2" aria-label="Offer code">
                               {offerCode.code.toUpperCase()}
@@ -378,7 +378,7 @@ const DiscountsPage = ({
                         expiresAt ? formatDate(expiresAt) : "No end date"
                       }`}</td>
                       <td className="whitespace-nowrap">
-                        <div className="grid grid-cols-[min-content_1fr] gap-2">
+                        <div className="override grid grid-cols-[min-content_1fr] gap-2">
                           {validAt && currentDate < validAt ? (
                             <>Scheduled</>
                           ) : expiresAt && currentDate > expiresAt ? (
@@ -427,7 +427,8 @@ const DiscountsPage = ({
                                 role="menuitem"
                                 className="danger"
                                 inert={!offerCode.can_update || isLoading}
-                                onClick={asyncVoid(async () => {
+                                onClick={asyncVoid(async (e) => {
+                                  e.stopPropagation();
                                   try {
                                     setIsLoading(true);
                                     setPopoverOfferCodeId(null);
@@ -457,7 +458,7 @@ const DiscountsPage = ({
                 pagination={pagination}
               />
             ) : null}
-          </>
+          </section>
         ) : (
           <div className="placeholder">
             <figure>
@@ -548,7 +549,7 @@ const DiscountsPage = ({
                       ? (selectedOfferCodeStatistics.uses.products[product.id] ?? 0)
                       : null;
                   return (
-                    <div key={product.id} className="grid grid-cols-[1fr_auto] gap-2">
+                    <div key={product.id} className="override grid grid-cols-[1fr_auto] gap-2">
                       <div>
                         <h5>{product.name}</h5>
                         {uses != null ? `${uses} ${uses === 1 ? "use" : "uses"}` : null}
@@ -863,7 +864,7 @@ const Form = ({
             <legend>
               <label htmlFor={`${uid}code`}>Discount code</label>
             </legend>
-            <div className="grid grid-cols-[1fr_auto] gap-2">
+            <div className="override grid grid-cols-[1fr_auto] gap-2">
               <input
                 type="text"
                 id={`${uid}code`}
