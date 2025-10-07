@@ -17,8 +17,8 @@ describe SaveFilesService do
     end
 
     it "updates files" do
-      file_1 = create(:product_file, link: @product, description: "pencil", url: "https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png")
-      file_2 = create(:product_file, link: @product, description: "manual", url: "https://s3.amazonaws.com/gumroad-specs/attachment/manual.pdf")
+      file_1 = create(:product_file, link: @product, description: "pencil", url: "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/pencil.png")
+      file_2 = create(:product_file, link: @product, description: "manual", url: "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/manual.pdf")
 
       @product.product_files << file_1
       @product.product_files << file_2
@@ -33,7 +33,7 @@ describe SaveFilesService do
                         },
                                 {
                                   external_id: SecureRandom.uuid,
-                                  url: "https://s3.amazonaws.com/gumroad-specs/attachment/book.pdf",
+                                  url: "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/book.pdf",
                                   display_name: "new book",
                                   description: "new book description",
                                   position: 1
@@ -57,8 +57,8 @@ describe SaveFilesService do
       expect(manual_file.position).to eq(2)
 
       book_file = @product.product_files.alive[1].reload
-      expect(book_file.url).to eq("https://s3.amazonaws.com/gumroad-specs/attachment/book.pdf")
-      expect(book_file.unique_url_identifier).to eq("https://s3.amazonaws.com/gumroad-specs/attachment/book.pdf")
+      expect(book_file.url).to eq("https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/book.pdf")
+      expect(book_file.unique_url_identifier).to eq("https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/book.pdf")
       expect(book_file.display_name).to eq("new book")
       expect(book_file.description).to eq("new book description")
       expect(book_file.position).to eq(1)
@@ -129,8 +129,8 @@ describe SaveFilesService do
 
     it "supports `files` param as an array" do
       installment = create(:installment, workflow: create(:workflow))
-      file1 = create(:product_file, installment:, url: "https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png")
-      file2 = create(:product_file, installment:, url: "https://s3.amazonaws.com/gumroad-specs/attachment/manual.pdf")
+      file1 = create(:product_file, installment:, url: "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/pencil.png")
+      file2 = create(:product_file, installment:, url: "https://s3.ap-southeast-2.amazonaws.com/gumroad-specs/attachment/manual.pdf")
       service.perform(installment, {
                         files: [
                           {

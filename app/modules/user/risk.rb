@@ -3,7 +3,7 @@
 module User::Risk
   extend ActiveSupport::Concern
 
-  IFFY_ENDPOINT = "http://internal-production-iffy-live-internal-1668548970.us-east-1.elb.amazonaws.com"
+  IFFY_ENDPOINT = "http://internal-production-iffy-live-internal-1668548970.ap-southeast-2.elb.amazonaws.com"
 
   PAYMENT_REMINDER_RISK_STATES = %w[flagged_for_tos_violation not_reviewed compliant].freeze
   INCREMENTAL_ENQUEUE_BALANCE = 100_00

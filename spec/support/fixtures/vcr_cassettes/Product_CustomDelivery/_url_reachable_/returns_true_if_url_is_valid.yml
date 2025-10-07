@@ -43,7 +43,7 @@ http_interactions:
       X-Cache-Hits:
       - '1'
       X-Cluster-Name:
-      - us-east-1-prod-edge-eks-15
+      - ap-southeast-2-prod-edge-eks-15
       X-Served-By:
       - cache-iad-kjyo7100044-IAD
       X-Timer:

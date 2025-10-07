@@ -3,7 +3,7 @@
 # aws credentials for the web app are stored in the secrets
 AWS_ACCESS_KEY = GlobalConfig.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_KEY = GlobalConfig.get("AWS_SECRET_ACCESS_KEY")
-AWS_DEFAULT_REGION = GlobalConfig.get("AWS_DEFAULT_REGION", "us-east-1")
+AWS_DEFAULT_REGION = GlobalConfig.get("AWS_DEFAULT_REGION", "ap-southeast-2")
 
 Aws.config.update(
   region: AWS_DEFAULT_REGION,
@@ -24,17 +24,17 @@ KINDLE_EMAIL_REGEX = /\A(?=.{3,255}$)(                                         #
                      @kindle\.com\z/xi
 
 S3_BUCKET = {
-  development: "gumroad_dev",
-  staging: "gumroad_dev",
+  development: "gumroad-dev-jyo",
+  staging: "gumroad-dev-jyo",
   test: "gumroad-specs",
   production: "gumroad"
 }[Rails.env.to_sym]
 
-S3_BASE_URL = GlobalConfig.get("S3_BASE_URL_TEMPLATE", "https://s3.amazonaws.com/#{S3_BUCKET}/")
+S3_BASE_URL = GlobalConfig.get("S3_BASE_URL_TEMPLATE", "https://s3.ap-southeast-2.amazonaws.com/#{S3_BUCKET}/")
 
 PUBLIC_STORAGE_S3_BUCKET = {
-  development: "gumroad-dev-public-storage",
-  staging: "gumroad-dev-public-storage",
+  development: "gumroad-dev-public-storage-jyo",
+  staging: "gumroad-dev-public-storage-jyo",
   test: "gumroad-specs",
   production: "gumroad-public-storage"
 }[Rails.env.to_sym]
@@ -65,6 +65,6 @@ HLS_PRESETS = {
 
 AWS_ACCOUNT_ID = GlobalConfig.get("AWS_ACCOUNT_ID")
 mediaconvert_queue_name = Rails.env.production? ? "production" : "staging"
-MEDIACONVERT_QUEUE = GlobalConfig.get("MEDIACONVERT_QUEUE_TEMPLATE", "arn:aws:mediaconvert:us-east-1:#{AWS_ACCOUNT_ID}:queues/#{mediaconvert_queue_name}")
+MEDIACONVERT_QUEUE = GlobalConfig.get("MEDIACONVERT_QUEUE_TEMPLATE", "arn:aws:mediaconvert:ap-southeast-2:#{AWS_ACCOUNT_ID}:queues/#{mediaconvert_queue_name}")
 MEDIACONVERT_ROLE = GlobalConfig.get("MEDIACONVERT_ROLE", "arn:aws:iam::#{AWS_ACCOUNT_ID}:role/service-role/MediaConvert_Default_Role")
-MEDIACONVERT_ENDPOINT = GlobalConfig.get("MEDIACONVERT_ENDPOINT", "https://lxlxpswfb.mediaconvert.us-east-1.amazonaws.com")
+MEDIACONVERT_ENDPOINT = GlobalConfig.get("MEDIACONVERT_ENDPOINT", "https://lxlxpswfb.mediaconvert.ap-southeast-2.amazonaws.com")

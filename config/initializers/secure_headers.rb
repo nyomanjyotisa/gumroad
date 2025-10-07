@@ -43,16 +43,16 @@ SecureHeaders::Configuration.default do |config|
       "api.dropboxapi.com",
 
       # direct file uploads to aws s3
-      "s3.amazonaws.com/#{S3_BUCKET}",
-      "s3.amazonaws.com/#{S3_BUCKET}/",
+      "s3.ap-southeast-2.amazonaws.com/#{S3_BUCKET}",
+      "s3.ap-southeast-2.amazonaws.com/#{S3_BUCKET}/",
 
       # direct file uploads to aws s3
-      "#{PUBLIC_STORAGE_S3_BUCKET}.s3.amazonaws.com",
-      "#{PUBLIC_STORAGE_S3_BUCKET}.s3.amazonaws.com/",
+      "#{PUBLIC_STORAGE_S3_BUCKET}.s3.ap-southeast-2.amazonaws.com",
+      "#{PUBLIC_STORAGE_S3_BUCKET}.s3.ap-southeast-2.amazonaws.com/",
 
       # direct file uploads to aws s3
-      "s3.amazonaws.com/#{PUBLIC_STORAGE_S3_BUCKET}",
-      "s3.amazonaws.com/#{PUBLIC_STORAGE_S3_BUCKET}/",
+      "s3.ap-southeast-2.amazonaws.com/#{PUBLIC_STORAGE_S3_BUCKET}",
+      "s3.ap-southeast-2.amazonaws.com/#{PUBLIC_STORAGE_S3_BUCKET}/",
 
       # recaptcha
       "www.google.com",
