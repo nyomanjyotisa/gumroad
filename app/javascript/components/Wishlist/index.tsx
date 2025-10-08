@@ -192,6 +192,7 @@ export const Wishlist = ({
   const [pagination, setPagination] = React.useState(initialPagination);
   const [isEditing, setIsEditing] = React.useState(false);
   const [loadingMore, setLoadingMore] = React.useState(false);
+  const [checkoutEnabled, setCheckoutEnabled] = React.useState(checkout_enabled);
   const gridRef = React.useRef<HTMLDivElement | null>(null);
 
   const loadMoreWishlistItems = async () => {
@@ -247,7 +248,7 @@ export const Wishlist = ({
               <NavigationButton
                 color="accent"
                 href={Routes.checkout_index_url({ params: { wishlist: id } })}
-                disabled={!checkout_enabled}
+                disabled={!checkoutEnabled}
               >
                 <Icon name="cart3-fill" />
                 Buy this wishlist
@@ -273,7 +274,11 @@ export const Wishlist = ({
               item={item}
               canEdit={can_edit}
               onDelete={() => {
-                setItems((prev) => prev.filter((i) => i.id !== item.id));
+                const updatedItems = items.filter((i) => i.id !== item.id);
+                setItems(updatedItems);
+                if (updatedItems.length === 0) {
+                  setCheckoutEnabled(false);
+                }
                 // Go back to first page to avoid empty last page
                 setPagination(initialPagination);
               }}
