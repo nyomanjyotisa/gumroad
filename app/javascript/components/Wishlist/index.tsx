@@ -281,12 +281,12 @@ export const Wishlist = ({
           ))}
         </div>
 
-        {can_edit && items.length === 0 ? (
+        {items.length === 0 ? (
           <div className="placeholder">
             <figure>
               <Icon name="gift-fill" />
             </figure>
-            Products from your wishlist will be displayed here
+            {can_edit ? "Products from your wishlist will be displayed here" : "This wishlist is currently empty"}
           </div>
         ) : null}
 
