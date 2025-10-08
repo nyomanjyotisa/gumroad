@@ -98,6 +98,7 @@ const UpsellsPage = (props: {
   const [view, setView] = React.useState<"list" | "create" | "edit">("list");
 
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const [sort, setSort] = React.useState<Sort<SortKey> | null>(null);
   const thProps = useSortingTableDriver<SortKey>(sort, (newSort) => {
@@ -189,6 +190,7 @@ const UpsellsPage = (props: {
     if (!selectedUpsellId) return;
     try {
       setIsLoading(true);
+      setIsDeleting(true);
       setState(await deleteUpsell(selectedUpsellId));
       setSelectedUpsellId(null);
       showAlert("Successfully deleted upsell!", "success");
@@ -197,6 +199,7 @@ const UpsellsPage = (props: {
       showAlert(e.message, "error");
     }
     setIsLoading(false);
+    setIsDeleting(false);
   });
 
   const handleTogglePause = asyncVoid(async () => {
@@ -344,6 +347,7 @@ const UpsellsPage = (props: {
             onTogglePause={handleTogglePause}
             onClose={handleCancel}
             isLoading={isLoading}
+            isDeleting={isDeleting}
           />
         ) : null}
       </section>
@@ -378,6 +382,7 @@ const UpsellDrawer = ({
   onTogglePause,
   onClose,
   isLoading,
+  isDeleting,
 }: {
   selectedUpsell: Upsell;
   statistics: UpsellStatistics | null;
@@ -387,6 +392,7 @@ const UpsellDrawer = ({
   onTogglePause: () => void;
   onClose: () => void;
   isLoading: boolean;
+  isDeleting: boolean;
 }) => {
   const loggedInUser = useLoggedInUser();
   const isReadOnly = !loggedInUser?.policies.upsell.create;
@@ -498,7 +504,7 @@ const UpsellDrawer = ({
           Edit
         </Button>
         <Button onClick={onDelete} color="danger" disabled={isLoading || isReadOnly}>
-          {isLoading ? "Deleting..." : "Delete"}
+          {isDeleting ? "Deleting..." : "Delete"}
         </Button>
       </section>
     </aside>
