@@ -584,6 +584,21 @@ const FileEmbedNodeView = ({ node, editor, getPos, updateAttributes }: NodeViewP
               />
             </fieldset>
 
+            {FileUtils.isDocumentExtension(file.extension) ? (
+              <fieldset>
+                <legend>
+                  <label htmlFor={`${uid}isbn`}>ISBN</label>
+                </legend>
+                <input
+                  type="text"
+                  id={`${uid}isbn`}
+                  value={file.isbn ?? ""}
+                  onChange={(evt) => updateFile({ isbn: evt.target.value })}
+                  placeholder="ISBN"
+                />
+              </fieldset>
+            ) : null}
+
             {file.is_pdf ? (
               <label>
                 <input
