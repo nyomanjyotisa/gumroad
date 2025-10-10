@@ -27,11 +27,9 @@ import AffiliatedPage from "$app/components/server-components/AffiliatedPage";
 import AffiliateRequestPage from "$app/components/server-components/AffiliateRequestPage";
 import AffiliatesPage from "$app/components/server-components/AffiliatesPage";
 import Alert from "$app/components/server-components/Alert";
-import AnalyticsPage from "$app/components/server-components/AnalyticsPage";
 import ArchivedProductsPage from "$app/components/server-components/ArchivedProductsPage";
 import AudienceCustomersPage from "$app/components/server-components/Audience/CustomersPage";
 import AudiencePage from "$app/components/server-components/AudiencePage";
-import BalancePage from "$app/components/server-components/BalancePage";
 import BundleEditPage from "$app/components/server-components/BundleEditPage";
 import CheckoutPage from "$app/components/server-components/CheckoutPage";
 import CollaboratorsPage from "$app/components/server-components/CollaboratorsPage";
@@ -126,7 +124,6 @@ ReactOnRails.register({
   AffiliateRequestPage,
   AffiliatesPage,
   Alert,
-  AnalyticsPage,
   AdminAddCreditForm,
   ApplicationEditPage,
   ArchivedProductsPage,
@@ -135,7 +132,6 @@ ReactOnRails.register({
   AudienceCustomersPage,
   AudiencePage,
   AuthorizedApplicationsSettingsPage,
-  BalancePage,
   BundleEditPage,
   CheckoutPage,
   CollaboratorsPage,
