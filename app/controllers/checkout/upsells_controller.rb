@@ -5,12 +5,17 @@ class Checkout::UpsellsController < Sellers::BaseController
 
   PER_PAGE = 20
 
+  layout "inertia", only: [:index]
+
   def index
     authorize [:checkout, Upsell]
 
     @title = "Upsells"
     pagination, upsells = fetch_upsells
-    @upsells_props = Checkout::UpsellsPresenter.new(pundit_user:, pagination:, upsells:).upsells_props
+    upsells_props = Checkout::UpsellsPresenter.new(pundit_user:, pagination:, upsells:).upsells_props
+
+    render inertia: "Checkout/Upsells/Index",
+           props: upsells_props
   end
 
   def paged
@@ -125,7 +130,7 @@ class Checkout::UpsellsController < Sellers::BaseController
 
   private
     def upsell_params
-      params.permit(:name, :text, :description, :cross_sell, :product_id, :variant_id, :universal, :replace_selected_products, offer_code: [:amount_cents, :amount_percentage], product_ids: [], upsell_variants: [:selected_variant_id, :offered_variant_id])
+      params.permit(:name, :text, :description, :cross_sell, :product_id, :variant_id, :universal, :replace_selected_products, :paused, offer_code: [:amount_cents, :amount_percentage], product_ids: [], upsell_variants: [:selected_variant_id, :offered_variant_id])
     end
 
     def assign_upsell_attributes

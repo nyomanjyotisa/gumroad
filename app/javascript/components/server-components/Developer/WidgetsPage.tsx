@@ -48,7 +48,7 @@ export const WidgetsPage = ({ display_product_select, products, affiliated_produ
   return (
     <Layout currentPage="widgets">
       <form>
-        <section className="!p-4 md:!p-8">
+        <section className="p-4! md:p-8!">
           <header>
             <h3>Share your product</h3>
             <p>
@@ -69,7 +69,7 @@ export const WidgetsPage = ({ display_product_select, products, affiliated_produ
           </div>
         </section>
         {currentSeller ? (
-          <section className="!p-4 md:!p-8">
+          <section className="p-4! md:p-8!">
             <header>
               <h3>Subscribe form</h3>
               <p>
@@ -229,7 +229,7 @@ const OverlayPanel = ({ selectedProduct }: PanelProps) => {
         </fieldset>
       </div>
       <CodeContainer codeToCopy={codeToCopy} />
-      <fieldset style={{ display: "grid", gap: "var(--spacer-4)" }}>
+      <fieldset className="override grid gap-4">
         <label>
           <input type="checkbox" checked={isWanted} onChange={(e) => setIsWanted(e.target.checked)} role="switch" />
           Send directly to checkout page

@@ -131,7 +131,7 @@ const AddTeamMembersSection = ({
   });
 
   return (
-    <section className="!p-4 md:!p-8">
+    <section className="p-4! md:p-8!">
       <header>
         <h2>Add team members</h2>
         <div>Invite as many team members as you need to help run this account.</div>
@@ -261,7 +261,7 @@ const TeamMembersSection = ({
   };
 
   return (
-    <section className="!p-4 md:!p-8">
+    <section className="p-4! md:p-8!">
       <header>
         <h2 ref={ref}>Team members</h2>
       </header>
@@ -332,14 +332,11 @@ const TeamMembersSection = ({
               </td>
               <td data-label="Role">
                 {memberInfo.leave_team_option ? (
-                  <Button
-                    color="danger"
-                    disabled={loading}
-                    style={{ float: "right" }}
-                    onClick={() => setConfirming(memberInfo)}
-                  >
-                    {memberInfo.leave_team_option.label}
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button color="danger" disabled={loading} onClick={() => setConfirming(memberInfo)}>
+                      {memberInfo.leave_team_option.label}
+                    </Button>
+                  </div>
                 ) : (
                   <Select
                     instanceId={memberInfo.id}

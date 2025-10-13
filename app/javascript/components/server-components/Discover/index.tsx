@@ -44,22 +44,22 @@ const ProductsCarousel = ({ products, title }: { products: CardProduct[]; title:
   const [dragStart, setDragStart] = React.useState<number | null>(null);
 
   return (
-    <section className="carousel-section">
-      <header>
+    <section className="grid gap-4">
+      <header className="flex items-center justify-between">
         <h2>{title}</h2>
-        <div className="actions">
+        <div className="flex items-center gap-2">
           <button onClick={() => setActive((active + products.length - 1) % products.length)}>
-            <Icon name="arrow-left" />
+            <Icon name="arrow-left" className="text-xl" />
           </button>
           {active + 1} / {products.length}
           <button onClick={() => setActive((active + products.length + 1) % products.length)}>
-            <Icon name="arrow-right" />
+            <Icon name="arrow-right" className="text-xl" />
           </button>
         </div>
       </header>
-      <div className="carousel">
+      <div className="relative">
         <div
-          className="items"
+          className="override grid auto-cols-[min(20rem,60vw)] grid-flow-col gap-6 min-h-96 pb-1 lg:auto-cols-[40rem] overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           ref={itemsRef}
           style={{ scrollSnapType: dragStart != null ? "none" : undefined }}
           onScroll={handleScroll}
@@ -202,7 +202,7 @@ const Discover = (props: Props) => {
       query={state.params.query}
       setQuery={(query) => dispatch({ type: "set-params", params: { query, taxonomy: taxonomyPath } })}
     >
-      <div className="grid !gap-16 px-4 py-16 lg:pe-16 lg:ps-16">
+      <div className="grid gap-16! px-4 py-16 lg:ps-16 lg:pe-16">
         {showRecommendedSections ? (
           <ProductsCarousel
             products={recommendedProducts}
@@ -272,7 +272,7 @@ const Discover = (props: Props) => {
                 <fieldset role="group">
                   {range(4, 0).map((number) => (
                     <label key={number}>
-                      <span className="rating">
+                      <span className="flex shrink-0 items-center gap-1">
                         <RatingStars rating={number} />
                         and up
                       </span>
