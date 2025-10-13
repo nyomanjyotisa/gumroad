@@ -312,7 +312,6 @@ describe "Wishlist show page", :js, type: :system do
   context "when viewing as a non-editor" do
     it "shows the empty state message for viewers" do
       logout
-      visit wishlist_url(wishlist.external_id_numeric, host: wishlist.user.subdomain_with_protocol)
       wishlist.wishlist_products.destroy_all
       visit wishlist_url(wishlist.external_id_numeric, host: wishlist.user.subdomain_with_protocol)
 
