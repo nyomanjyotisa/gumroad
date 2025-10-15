@@ -243,7 +243,12 @@ const CtaBar = ({
 
         setVisible(!entry.isIntersecting);
 
-        if (!entry.isIntersecting && !shouldAddPaddingTop && entry.boundingClientRect.top >= 0) {
+        if (
+          !window.location.search.includes("layout=discover") &&
+          !entry.isIntersecting &&
+          !shouldAddPaddingTop &&
+          entry.boundingClientRect.top >= 0
+        ) {
           setShouldAddPaddingTop(true);
         }
       },
