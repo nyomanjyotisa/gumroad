@@ -8,6 +8,8 @@ class CustomersController < Sellers::BaseController
 
   CUSTOMERS_PER_PAGE = 20
 
+  layout "inertia", only: [:index]
+
   def index
     product = Link.fetch(params[:link_id]) if params[:link_id].present?
     sales = fetch_sales(products: [product].compact)
@@ -169,9 +171,12 @@ class CustomersController < Sellers::BaseController
           :tip,
           :upsell_purchase,
           :variant_attributes,
+          :url_redirect,
+          :link,
           product_review: [:response, { alive_videos: [:video_file] }],
           utm_link: [target_resource: [:seller, :user]]
         )
+        .in_order_of(:id, sales.records.ids)
         .load
     end
 

@@ -69,15 +69,9 @@ const ReviewsPage = ({
   return (
     <Layout selectedTab="reviews" followingWishlistsEnabled={following_wishlists_enabled}>
       {purchases.length ? (
-        <section className="space-y-4 p-4 md:p-8">
+        <section className="@container space-y-4 p-4 md:p-8">
           <h2>{`${purchases.length} ${purchases.length === 1 ? "product" : "products"} awaiting review`}</h2>
-          <div
-            className="grid"
-            style={{
-              "--max-grid-relative-size": "33%",
-              "--min-grid-absolute-size": "18rem",
-            }}
-          >
+          <div className="grid gap-4 @xl:grid-cols-2 @4xl:grid-cols-3">
             {purchases.map((purchase) => (
               <div className="cart h-min" role="list" key={purchase.id}>
                 <div key={purchase.id} role="listitem">
@@ -135,7 +129,7 @@ const ReviewsPage = ({
         </section>
       ) : null}
       <section className="p-4 md:p-8">
-        {reviews.length === 0 ? (
+        {reviews.length === 0 && purchases.length === 0 ? (
           <div className="placeholder">
             <figure>
               <img src={placeholderImage} />
@@ -149,7 +143,7 @@ const ReviewsPage = ({
               Learn more about reviews
             </a>
           </div>
-        ) : (
+        ) : reviews.length > 0 ? (
           <table>
             <caption>Your reviews</caption>
             <tbody>
@@ -166,7 +160,7 @@ const ReviewsPage = ({
               ))}
             </tbody>
           </table>
-        )}
+        ) : null}
       </section>
     </Layout>
   );
