@@ -13,6 +13,8 @@ import { Icon } from "$app/components/Icons";
 import { Card } from "$app/components/Product/Card";
 import { Progress } from "$app/components/Progress";
 import { showAlert } from "$app/components/server-components/Alert";
+import Placeholder from "$app/components/ui/Placeholder";
+import { ProductCardGrid } from "$app/components/ui/ProductCardGrid";
 import { useDebouncedCallback } from "$app/components/useDebouncedCallback";
 import { useOnChange } from "$app/components/useOnChange";
 import { useOnScrollToBottom } from "$app/components/useOnScrollToBottom";
@@ -73,17 +75,17 @@ export const ContentTab = () => {
             <h1>Library</h1>
           </header>
           <section>
-            <div className="product-card-grid">
+            <ProductCardGrid>
               {bundle.products.map((bundleProduct) => (
                 <Card key={bundleProduct.id} product={bundleProduct} />
               ))}
-            </div>
+            </ProductCardGrid>
           </section>
         </div>
       }
     >
       <form onSubmit={(evt) => evt.preventDefault()} ref={formRef}>
-        <section className="!p-4 md:!p-8">
+        <section className="p-4! md:p-8!">
           {hasOutdatedPurchases ? <BundleContentUpdatedStatus /> : null}
           {isSelecting ? (
             <>
@@ -133,7 +135,10 @@ export const ContentTab = () => {
                   ))}
                 </div>
               ) : null}
-              <div className="card" aria-label="Product selector">
+              <div
+                className="grid gap-4 rounded-sm border border-border bg-background p-4"
+                aria-label="Product selector"
+              >
                 <div className="input">
                   <Icon name="solid-search" />
                   <input
@@ -173,14 +178,14 @@ export const ContentTab = () => {
               </div>
             </>
           ) : (
-            <section className="placeholder">
+            <Placeholder>
               <h2>Select products</h2>
               <p>Choose the products you want to include in your bundle</p>
               <Button color="primary" onClick={() => setIsSelecting(true)}>
                 <Icon name="plus" />
                 Add products
               </Button>
-            </section>
+            </Placeholder>
           )}
         </section>
       </form>

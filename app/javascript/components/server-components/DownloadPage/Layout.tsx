@@ -55,6 +55,7 @@ export type LayoutProps = {
       has_active_subscription: boolean;
       subscription_id: string;
       is_subscription_ended: boolean | null;
+      is_installment_plan_completed: boolean | null;
       is_subscription_cancelled_or_failed: boolean | null;
       is_alive_or_restartable: boolean | null;
       in_free_trial: boolean;
@@ -145,7 +146,7 @@ export const Layout = ({
                 purchase.membership.is_installment_plan ? (
                   <details>
                     <summary>Installment plan</summary>
-                    {purchase.membership.is_subscription_ended ? (
+                    {purchase.membership.is_installment_plan_completed ? (
                       "This installment plan has been paid in full."
                     ) : (
                       <NavigationButton href={Routes.manage_subscription_url(purchase.membership.subscription_id)}>
@@ -434,7 +435,7 @@ const AddToLibrary = ({ add_to_library_option, terms_page_url, purchase_id, purc
         <>
           <span>Create an account to access all of your purchases in one place</span>
           <div>
-            <form autoComplete="off" onSubmit={handleSignupAndAddPurchaseToLibrary} className="override grid gap-4">
+            <form autoComplete="off" onSubmit={handleSignupAndAddPurchaseToLibrary} className="grid gap-4">
               <fieldset>
                 <input
                   type="password"
