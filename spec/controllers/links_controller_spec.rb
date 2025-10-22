@@ -5,6 +5,7 @@ require "shared_examples/affiliate_cookie_concern"
 require "shared_examples/authorize_called"
 require "shared_examples/collaborator_access"
 require "shared_examples/with_sorting_and_pagination"
+require "inertia_rails/rspec"
 
 def e404_test(action)
   it "404s when link isn't found" do
@@ -12,7 +13,7 @@ def e404_test(action)
   end
 end
 
-describe LinksController, :vcr do
+describe LinksController, :vcr, inertia: true do
   render_views
 
   context "within seller area" do
@@ -74,15 +75,9 @@ describe LinksController, :vcr do
 
       describe "shows the correct number of sales" do
         def expect_sales_count_in_inertia_response(expected_count)
-          data_page_match = response.body.match(/data-page="([^"]*)"/)
-          expect(data_page_match).to be_present, "Expected Inertia.js data-page attribute"
-
-          decoded_content = CGI.unescapeHTML(data_page_match[1])
-          json_data = JSON.parse(decoded_content)
-
-          products = json_data["props"]["react_products_page_props"]["products"]
+          products = inertia.props[:react_products_page_props][:products]
           expect(products).to be_present, "Expected products in Inertia.js response"
-          expect(products.first["successful_sales_count"]).to eq(expected_count)
+          expect(products.first[:successful_sales_count]).to eq(expected_count)
         end
 
         it "with a single sale" do
@@ -91,8 +86,7 @@ describe LinksController, :vcr do
           get(:index)
           expect(response).to be_successful
 
-          expect(response.body).to include("data-page")
-          expect(response.body).to include("Products/index")
+          expect(inertia).to render_component("Products/Index")
 
           expect_sales_count_in_inertia_response(1)
         end
@@ -102,8 +96,7 @@ describe LinksController, :vcr do
           get(:index)
           expect(response).to be_successful
 
-          expect(response.body).to include("data-page")
-          expect(response.body).to include("Products/index")
+          expect(inertia).to render_component("Products/Index")
 
           expect_sales_count_in_inertia_response(3_030)
         end
@@ -114,8 +107,7 @@ describe LinksController, :vcr do
           get(:index)
           expect(response).to be_successful
 
-          expect(response.body).to include("data-page")
-          expect(response.body).to include("Products/index")
+          expect(inertia).to render_component("Products/Index")
 
           expect_sales_count_in_inertia_response(424_242)
         end
@@ -126,8 +118,7 @@ describe LinksController, :vcr do
           get(:index)
           expect(response).to be_successful
 
-          expect(response.body).to include("data-page")
-          expect(response.body).to include("Products/index")
+          expect(inertia).to render_component("Products/Index")
 
           expect_sales_count_in_inertia_response(1_111)
         end
@@ -139,18 +130,11 @@ describe LinksController, :vcr do
 
           expect(response).to be_successful
 
-          expect(response.body).to include("data-page")
-          expect(response.body).to include("Products/index")
+          expect(inertia).to render_component("Products/Index")
 
-          data_page_match = response.body.match(/data-page="([^"]*)"/)
-          expect(data_page_match).to be_present
-
-          decoded_content = CGI.unescapeHTML(data_page_match[1])
-          json_data = JSON.parse(decoded_content)
-
-          products = json_data["props"]["react_products_page_props"]["products"]
+          products = inertia.props[:react_products_page_props][:products]
           expect(products).to be_present
-          expect(products.first["url_without_protocol"]).to be_present
+          expect(products.first[:url_without_protocol]).to be_present
         end
       end
     end
@@ -703,7 +687,7 @@ describe LinksController, :vcr do
       describe "content_updated_at" do
         it "is updated when a new file is uploaded" do
           freeze_time do
-            url = "https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png"
+            url = "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/pencil.png"
             post(:update, params: @params.merge!(files: [{ id: SecureRandom.uuid, url: }]), format: :json)
 
             @product.reload
@@ -1503,7 +1487,7 @@ describe LinksController, :vcr do
         end
 
         it "preserves correct s3 key for s3 files containing percent and ampersand" do
-          urls = ["https://s3.amazonaws.com/gumroad-specs/specs/test file %26 & ) %29.txt"]
+          urls = ["#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/specs/test file %26 & ) %29.txt"]
           post :update, params: @params.merge!(files: files_data_from_urls(urls)), format: :json
           expect(response).to be_successful
           product_file = @product.alive_product_files.first
@@ -1511,36 +1495,36 @@ describe LinksController, :vcr do
         end
 
         it "saves the files properly" do
-          urls = ["https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png",
-                  "https://s3.amazonaws.com/gumroad-specs/attachment/manual.pdf"]
+          urls = ["#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/pencil.png",
+                  "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/manual.pdf"]
           post :update, params: @params.merge!(files: files_data_from_urls(urls)), format: :json
           expect(response).to be_successful
           expect(@product.alive_product_files.count).to eq 2
-          expect(@product.alive_product_files[0].url).to eq "https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png"
-          expect(@product.alive_product_files[1].url).to eq "https://s3.amazonaws.com/gumroad-specs/attachment/manual.pdf"
+          expect(@product.alive_product_files[0].url).to eq "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/pencil.png"
+          expect(@product.alive_product_files[1].url).to eq "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/manual.pdf"
         end
 
         it "has pdf filetype" do
-          urls = ["https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png",
-                  "https://s3.amazonaws.com/gumroad-specs/attachment/manual.pdf"]
+          urls = ["#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/pencil.png",
+                  "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/manual.pdf"]
           post :update, params: @params.merge!(files: files_data_from_urls(urls)), format: :json
           expect(@product.has_filetype?("pdf")).to be(true)
         end
 
         it "supports deleting and adding files" do
-          @product.product_files << create(:product_file, link: @product, url: "https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png")
+          @product.product_files << create(:product_file, link: @product, url: "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/pencil.png")
           @product.save!
 
-          urls = ["https://s3.amazonaws.com/gumroad-specs/attachment/manual.pdf"]
+          urls = ["#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/manual.pdf"]
           post :update, params: @params.merge!(files: files_data_from_urls(urls)), format: :json
           expect(response).to be_successful
           expect(@product.reload.alive_product_files.count).to eq 1
-          expect(@product.alive_product_files.first.url).to eq "https://s3.amazonaws.com/gumroad-specs/attachment/manual.pdf"
+          expect(@product.alive_product_files.first.url).to eq "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/manual.pdf"
         end
 
         it "allows 0 files for unpublished product" do
           @product.purchase_disabled_at = Time.current
-          @product.product_files << create(:product_file, link: @product, url: "https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png")
+          @product.product_files << create(:product_file, link: @product, url: "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/pencil.png")
           @product.save!
 
           post :update, params: @params.merge!(files: {}), format: :json
@@ -1548,7 +1532,7 @@ describe LinksController, :vcr do
         end
 
         it "updates product's rich content when file embed IDs exist in product_rich_content" do
-          urls = %w[https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png https://s3.amazonaws.com/gumroad-specs/attachment/manual.pdf]
+          urls = %W[#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/pencil.png #{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/manual.pdf]
           files_data = files_data_from_urls(urls)
           rich_content = create(:product_rich_content, entity: @product, description: [{ "type" => "paragraph", "content" => [{ "type" => "text", "text" => "Hello" }] }])
           old_rich_content = rich_content.description
@@ -1575,7 +1559,7 @@ describe LinksController, :vcr do
           version2_new_rich_content_description = [{ "type" => "fileEmbed", "attrs" => { "id" => external_id2, "uid" => "0c042930-2df1-4583-82ef-a6317213868d" } }]
 
           post :update, params: @params.merge!(
-            files: [{ id: external_id1, url: "https://s3.amazonaws.com/gumroad-specs/attachment/#{external_id1}/original/pencil.png" }, { id: external_id2, url: "https://s3.amazonaws.com/gumroad-specs/attachment/#{external_id2}/original/manual.pdf" }],
+            files: [{ id: external_id1, url: "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/#{external_id1}/original/pencil.png" }, { id: external_id2, url: "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/#{external_id2}/original/manual.pdf" }],
             variants: [{ id: version1.external_id, name: version1.name, rich_content: [{ id: version1_rich_content1.external_id, title: "Version 1 - Page 1", description: { type: "doc", content: version1_rich_content1_updated_description } }, { id: nil, title: "Version 1 - Page 2", description: { type: "doc", content: version1_new_rich_content_description } }] }, { id: version2.external_id, name: version2.name, rich_content: [{ id: nil, title: "Version 2 - Page 1", description: { type: "doc", content: version2_new_rich_content_description } }] }]
           ), format: :json
 
@@ -1994,7 +1978,7 @@ describe LinksController, :vcr do
       end
 
       it "enqueues a RenameProductFileWorker job" do
-        @product.product_files << create(:product_file, link: @product, url: "https://s3.amazonaws.com/gumroad-specs/attachment/pencil.png")
+        @product.product_files << create(:product_file, link: @product, url: "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/attachment/pencil.png")
         @product.save!
         post :update, params: {
           id: @product.unique_permalink,
@@ -3007,10 +2991,16 @@ describe LinksController, :vcr do
         get :new
 
         expect(response).to be_successful
-        expect(response.body).to have_text("Publish your first product")
-        expect(assigns[:react_new_product_page_props]).to eq(
-          ProductPresenter.new_page_props(current_seller: seller)
-        )
+        expect(assigns[:title]).to eq("What are you creating?")
+
+        expect(inertia).to render_component("Products/New")
+
+        expected_props = ProductPresenter.new_page_props(current_seller: seller)
+        expected_props.each do |key, value|
+          expect(inertia.props[key]).to eq(JSON.parse(value.to_json))
+        end
+
+        expect(inertia.props[:show_orientation_text]).to eq(true)
       end
 
       it "does not show the introduction text if the user has memberships" do
@@ -3018,10 +3008,16 @@ describe LinksController, :vcr do
         get :new
 
         expect(response).to be_successful
-        expect(response.body).to have_text("What are you creating?")
-        expect(assigns[:react_new_product_page_props]).to eq(
-          ProductPresenter.new_page_props(current_seller: seller)
-        )
+        expect(assigns[:title]).to eq("What are you creating?")
+
+        expect(inertia).to render_component("Products/New")
+
+        expected_props = ProductPresenter.new_page_props(current_seller: seller)
+        expected_props.each do |key, value|
+          expect(inertia.props[key]).to eq(JSON.parse(value.to_json))
+        end
+
+        expect(inertia.props[:show_orientation_text]).to eq(false)
       end
 
       it "does not show the introduction text if the user has products" do
@@ -3029,10 +3025,16 @@ describe LinksController, :vcr do
         get :new
 
         expect(response).to be_successful
-        expect(response.body).to have_text("What are you creating?")
-        expect(assigns[:react_new_product_page_props]).to eq(
-          ProductPresenter.new_page_props(current_seller: seller)
-        )
+        expect(assigns[:title]).to eq("What are you creating?")
+
+        expect(inertia).to render_component("Products/New")
+
+        expected_props = ProductPresenter.new_page_props(current_seller: seller)
+        expected_props.each do |key, value|
+          expect(inertia.props[key]).to eq(JSON.parse(value.to_json))
+        end
+
+        expect(inertia.props[:show_orientation_text]).to eq(false)
       end
     end
 

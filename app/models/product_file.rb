@@ -24,6 +24,12 @@ class ProductFile < ApplicationRecord
 
   has_one_attached :thumbnail
 
+  normalizes :isbn, with: ->(value) do
+    next if value.blank?
+
+    value.strip.upcase.gsub(/[\s–—−]/, "-")
+  end
+
   before_save :set_filegroup
   before_save :downcase_filetype
   after_commit :schedule_file_analyze, on: :create
@@ -40,6 +46,9 @@ class ProductFile < ApplicationRecord
             check_for_column: false
 
   validates_presence_of :url
+  validates :isbn, isbn: true, allow_nil: true, if: :supports_isbn?
+  validates :isbn, absence: { unless: :supports_isbn? }
+
   validate :valid_url?, on: :create
   validate :belongs_to_product_or_installment, on: :save
   validate :thumbnail_is_vaild
@@ -134,6 +143,10 @@ class ProductFile < ApplicationRecord
     filetype == "mobi"
   end
 
+  def supports_isbn?
+    epub? || pdf? || mobi?
+  end
+
   def streamable?
     filegroup == "video"
   end
@@ -208,7 +221,7 @@ class ProductFile < ApplicationRecord
     extension = s3_extension
     name_with_extension = display_name.ends_with?(extension) ? display_name : "#{display_name}#{extension}"
     new_key = MultipartTransfer.transfer_to_s3(self.s3_object.presigned_url(:get, expires_in: SignedUrlHelper::SIGNED_S3_URL_VALID_FOR_MAXIMUM.to_i).to_s, destination_filename: name_with_extension, existing_s3_object: self.s3_object)
-    self.url = URI::DEFAULT_PARSER.unescape("https://s3.amazonaws.com/#{S3_BUCKET}/#{new_key}")
+    self.url = URI::DEFAULT_PARSER.unescape("#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/#{new_key}")
     save!
   end
 

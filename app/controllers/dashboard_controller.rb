@@ -5,6 +5,8 @@ class DashboardController < Sellers::BaseController
   skip_before_action :check_suspended
   before_action :check_payment_details, only: :index
 
+  layout "inertia", only: :index
+
   def index
     authorize :dashboard
 
@@ -12,8 +14,8 @@ class DashboardController < Sellers::BaseController
       redirect_to products_url
     else
       presenter = CreatorHomePresenter.new(pundit_user)
-      render inertia: "Dashboard/index",
-             props: inertia_props(creator_home: presenter.creator_home_props)
+      render inertia: "Dashboard/Index",
+             props: { creator_home: presenter.creator_home_props }
     end
   end
 

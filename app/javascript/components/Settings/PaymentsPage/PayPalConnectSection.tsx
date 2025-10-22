@@ -45,7 +45,7 @@ const PayPalConnectSection = ({
   });
 
   return (
-    <section className="!p-4 md:!p-8">
+    <section className="p-4! md:p-8!">
       <header>
         <h2>PayPal</h2>
         <a href="/help/article/275-paypal-connect" target="_blank" rel="noreferrer">
@@ -92,7 +92,7 @@ const PayPalConnectSection = ({
         ) : paypalConnect.charge_processor_verified ? (
           <>
             <p>{connectAccountFeeInfoText}</p>
-            <div className="override grid gap-8">
+            <div className="grid gap-8">
               <fieldset>
                 <legend>
                   <label>PayPal account</label>

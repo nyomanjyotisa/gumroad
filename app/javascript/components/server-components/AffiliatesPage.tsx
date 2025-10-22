@@ -54,6 +54,7 @@ import { Popover } from "$app/components/Popover";
 import { Progress } from "$app/components/Progress";
 import { showAlert } from "$app/components/server-components/Alert";
 import { PageHeader } from "$app/components/ui/PageHeader";
+import Placeholder from "$app/components/ui/Placeholder";
 import { Tabs, Tab } from "$app/components/ui/Tabs";
 import { useDebouncedCallback } from "$app/components/useDebouncedCallback";
 import { useLocalPagination } from "$app/components/useLocalPagination";
@@ -319,7 +320,7 @@ const AffiliateRequestsTable = ({
           </tbody>
         </table>
       ) : (
-        <div className="placeholder">No requests yet</div>
+        <Placeholder>No requests yet</Placeholder>
       )}
 
       {showMoreItems ? <Button onClick={showMoreItems}>Load more</Button> : null}
@@ -573,12 +574,12 @@ const AffiliatesTab = () => {
                 ) : null}
               </>
             ) : (
-              <div className="placeholder">
+              <Placeholder>
                 <figure>
                   <img src={placeholder} />
                 </figure>
                 <h2>No affiliates found</h2>
-              </div>
+              </Placeholder>
             )}
           </>
         )}
@@ -805,7 +806,7 @@ const Form = ({ title, headerLabel, submitLabel }: FormProps) => {
       hasStickyHeader
     >
       <form>
-        <section className="!p-4 md:!p-8">
+        <section className="p-4! md:p-8!">
           <header dangerouslySetInnerHTML={{ __html: headerLabel }} />
           <fieldset className={cx({ danger: errors.has("email") })}>
             <legend>
