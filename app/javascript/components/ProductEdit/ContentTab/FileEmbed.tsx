@@ -24,12 +24,14 @@ import { Popover } from "$app/components/Popover";
 import { FileEntry, useProductEditContext } from "$app/components/ProductEdit/state";
 import { Progress } from "$app/components/Progress";
 import { useS3UploadConfig } from "$app/components/S3UploadConfig";
+import { Separator } from "$app/components/Separator";
 import { showAlert } from "$app/components/server-components/Alert";
 import { SubtitleList } from "$app/components/SubtitleList";
 import { SubtitleFile } from "$app/components/SubtitleList/Row";
 import { SubtitleUploadBox } from "$app/components/SubtitleUploadBox";
 import { FileEmbedGroup, titleWithFallback } from "$app/components/TiptapExtensions/FileEmbedGroup";
 import { NodeActionsMenu } from "$app/components/TiptapExtensions/NodeActionsMenu";
+import Placeholder from "$app/components/ui/Placeholder";
 import { WithTooltip } from "$app/components/WithTooltip";
 
 export const getDownloadUrl = (productId: string, file: FileEntry) =>
@@ -367,7 +369,7 @@ const FileEmbedNodeView = ({ node, editor, getPos, updateAttributes }: NodeViewP
                   }}
                 />
                 <button
-                  className="link"
+                  className="underline"
                   style={{
                     position: "absolute",
                     top: "50%",
@@ -391,7 +393,7 @@ const FileEmbedNodeView = ({ node, editor, getPos, updateAttributes }: NodeViewP
             )
           ) : (
             <div className="preview">
-              <div className="placeholder">
+              <Placeholder>
                 <label className="button primary">
                   {thumbnailInput}
                   <Icon name="upload-fill" />
@@ -401,11 +403,11 @@ const FileEmbedNodeView = ({ node, editor, getPos, updateAttributes }: NodeViewP
                   The thumbnail image is shown as a preview in the embedded video player. Your image should have a 16:9
                   aspect ratio, at least 1280x720px, and be in JPG, PNG, or GIF format.
                 </div>
-                <div role="separator">or</div>
+                <Separator>or</Separator>
                 <div>
                   <Button onClick={generateThumbnail}>Generate a thumbnail</Button>
                 </div>
-              </div>
+              </Placeholder>
             </div>
           )
         ) : null}
@@ -423,10 +425,10 @@ const FileEmbedNodeView = ({ node, editor, getPos, updateAttributes }: NodeViewP
               ) : (
                 <>
                   {file.thumbnail ? <img src={file.thumbnail.url} /> : null}
-                  <div className="placeholder">
+                  <Placeholder>
                     {thumbnailInput}
                     <Icon name="upload-fill" />
-                  </div>
+                  </Placeholder>
                 </>
               )}
             </label>
@@ -451,7 +453,7 @@ const FileEmbedNodeView = ({ node, editor, getPos, updateAttributes }: NodeViewP
 
                 {file.is_streamable && isComplete ? (
                   <li>
-                    <button className="link" onClick={() => setExpanded(!expanded)}>
+                    <button className="underline" onClick={() => setExpanded(!expanded)}>
                       {file.subtitle_files.length}{" "}
                       {file.subtitle_files.length === 1 ? "closed caption" : "closed captions"}
                     </button>
@@ -582,6 +584,21 @@ const FileEmbedNodeView = ({ node, editor, getPos, updateAttributes }: NodeViewP
                 placeholder="Description"
               />
             </fieldset>
+
+            {FileUtils.isDocumentExtension(file.extension) ? (
+              <fieldset>
+                <legend>
+                  <label htmlFor={`${uid}isbn`}>ISBN</label>
+                </legend>
+                <input
+                  type="text"
+                  id={`${uid}isbn`}
+                  value={file.isbn ?? ""}
+                  onChange={(evt) => updateFile({ isbn: evt.target.value })}
+                  placeholder="ISBN"
+                />
+              </fieldset>
+            ) : null}
 
             {file.is_pdf ? (
               <label>

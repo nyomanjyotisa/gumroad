@@ -13,7 +13,7 @@ module User::Risk
   ].freeze
   PROBATION_WITH_REMINDER_DAYS = 30
   PROBATION_REVIEW_DAYS = 2
-  MAX_REFUND_QUEUE_SIZE = 1000
+  MAX_REFUND_QUEUE_SIZE = 10000
   MAX_CHARGEBACK_RATE_ALLOWED_FOR_PAYOUTS = 3.0
 
   def self.contact_iffy_risk_analysis(iffy_request_parameters)
@@ -150,9 +150,18 @@ module User::Risk
   def suspended?
     suspended_for_tos_violation? || suspended_for_fraud?
   end
+  alias_method :suspended, :suspended?
 
   def flagged?
     flagged_for_tos_violation? || flagged_for_fraud?
+  end
+
+  def form_email_block
+    BlockedObject.email.find_active_object(email)
+  end
+
+  def form_email_domain_block
+    BlockedObject.email_domain.find_active_object(form_email_domain)
   end
 
   def add_user_comment(transition)
@@ -247,7 +256,6 @@ module User::Risk
         .group(:user_id)
         .having("SUM(amount_cents) > 0")
         .order(updated_at: :desc)
-        .limit(MAX_REFUND_QUEUE_SIZE)
     end
   end
 end

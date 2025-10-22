@@ -13,6 +13,7 @@ import { Button, NavigationButton } from "$app/components/Button";
 import { useAppDomain } from "$app/components/DomainSettings";
 import { Icon } from "$app/components/Icons";
 import { Modal } from "$app/components/Modal";
+import { SectionLayout } from "$app/components/Profile/Sections";
 import { ImageUploadSettingsContext } from "$app/components/RichTextEditor";
 import { showAlert } from "$app/components/server-components/Alert";
 import { ProfileProps, TabWithId, useTabs } from "$app/components/server-components/Profile";
@@ -31,6 +32,7 @@ import {
   Action,
   EditSection,
   useSectionImageUploadSettings,
+  SectionToolbar,
 } from "./EditSections";
 import { FollowFormBlock } from "./FollowForm";
 
@@ -194,9 +196,9 @@ export const EditProfile = (props: Props) => {
 
   return (
     <SectionReducerContext.Provider value={reducer}>
-      <header className="grid grid-cols-1 gap-4 border-b border-border px-4 py-8">
+      <header className="relative grid grid-cols-1 gap-4 border-b border-border px-4 py-8">
         {/* Work around position:absolute being affected by header's grid */}
-        <div role="toolbar" style={{ gridColumn: "unset" }}>
+        <SectionToolbar>
           <EditorMenu label="Page settings" onClose={() => void saveTabs(tabs)}>
             <EditorSubmenu heading="Pages" text={tabs.length}>
               {tabs.length > 0 ? (
@@ -223,7 +225,7 @@ export const EditProfile = (props: Props) => {
               <Button onClick={addTab}>New page</Button>
             </EditorSubmenu>
           </EditorMenu>
-        </div>
+        </SectionToolbar>
         {props.bio ? (
           <h1 style={{ whiteSpace: "pre-line" }}>
             <AutoLink text={props.bio} />
@@ -247,7 +249,7 @@ export const EditProfile = (props: Props) => {
           ))}
         </Tabs>
       </header>
-      <div className="!fixed right-3 top-5 z-30 !p-0 lg:left-3 lg:right-auto lg:top-3">
+      <div className="fixed! top-5 right-3 z-30 p-0! lg:top-3 lg:right-auto lg:left-3">
         <WithTooltip tip="Edit profile" position={isDesktop ? "right" : "left"}>
           <NavigationButton
             color="filled"
@@ -260,25 +262,24 @@ export const EditProfile = (props: Props) => {
       </div>
       {visibleSections.length ? (
         visibleSections.map((section, i) => (
-          <section
+          <SectionLayout
             key={section.id}
             id={section.id}
             style={{ overflowAnchor: section.id === movedSectionId ? "none" : undefined }}
-            className="border-b border-border px-4 py-8 lg:py-16"
           >
             <AddSectionButton index={i} />
             <ImageUploadSettingsContext.Provider value={imageUploadSettings}>
               <EditSection section={section} />
             </ImageUploadSettingsContext.Provider>
             {i === visibleSections.length - 1 ? <AddSectionButton index={i + 1} position="top" /> : null}
-          </section>
+          </SectionLayout>
         ))
       ) : (
-        <section style={{ flexGrow: 1, display: "grid" }}>
+        <SectionLayout className="grid flex-1">
           <AddSectionButton index={0} />
           <FollowFormBlock creatorProfile={props.creator_profile} />
           <AddSectionButton index={0} position="top" />
-        </section>
+        </SectionLayout>
       )}
     </SectionReducerContext.Provider>
   );

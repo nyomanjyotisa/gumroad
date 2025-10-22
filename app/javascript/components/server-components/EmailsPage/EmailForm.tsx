@@ -39,6 +39,7 @@ import { Popover } from "$app/components/Popover";
 import { PriceInput } from "$app/components/PriceInput";
 import { ImageUploadSettingsContext, RichTextEditor } from "$app/components/RichTextEditor";
 import { S3UploadConfigProvider } from "$app/components/S3UploadConfig";
+import { Separator } from "$app/components/Separator";
 import { showAlert } from "$app/components/server-components/Alert";
 import { editEmailPath, emailTabPath, newEmailPath } from "$app/components/server-components/EmailsPage";
 import { TagInput } from "$app/components/TagInput";
@@ -642,7 +643,7 @@ export const EmailForm = () => {
                   </Button>
                 }
               >
-                <div className="override grid gap-3">
+                <div className="grid gap-3">
                   <Button disabled={isBusy} onClick={() => save("save_and_preview_post")}>
                     <Icon name="file-earmark-medical-fill" />
                     Preview Post
@@ -674,7 +675,7 @@ export const EmailForm = () => {
                 </Button>
               }
             >
-              <div className="override grid gap-3">
+              <div className="grid gap-3">
                 <div style={{ display: "grid", gridTemplateColumns: "1fr max-content" }}>
                   {isSaving && secondsLeftToPublish > 0 ? (
                     <>
@@ -718,7 +719,7 @@ export const EmailForm = () => {
                     </Button>
                   )}
                 </div>
-                <div role="separator">OR</div>
+                <Separator>OR</Separator>
                 <fieldset className={cx({ danger: invalidFields.has("scheduleDate") })}>
                   <DateInput
                     withTime
@@ -744,7 +745,7 @@ export const EmailForm = () => {
         }
       />
       <section className="space-y-4 p-4 md:p-8">
-        <div className="with-sidebar">
+        <div className="grid grid-cols-1 items-start gap-x-16 gap-y-8 lg:grid-cols-[var(--grid-cols-sidebar)]">
           <div className="stack">
             <div>
               <fieldset role="group">
@@ -1087,7 +1088,7 @@ export const EmailForm = () => {
           </div>
           <S3UploadConfigProvider value={s3UploadConfig}>
             <EvaporateUploaderProvider value={evaporateUploader}>
-              <div className="override grid gap-6">
+              <div className="grid gap-6">
                 <fieldset className={cx({ danger: invalidFields.has("title") })}>
                   <input
                     ref={titleRef}

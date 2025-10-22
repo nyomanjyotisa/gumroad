@@ -9,7 +9,7 @@ import AutoLink from "$app/components/AutoLink";
 import { EditProfile, Props as EditProps } from "$app/components/Profile/EditPage";
 import { FollowFormBlock } from "$app/components/Profile/FollowForm";
 import { Layout } from "$app/components/Profile/Layout";
-import { PageProps as SectionsProps, Section } from "$app/components/Profile/Sections";
+import { PageProps as SectionsProps, Section, SectionLayout } from "$app/components/Profile/Sections";
 import { Tabs as UITabs, Tab as UITab } from "$app/components/ui/Tabs";
 import { useOriginalLocation } from "$app/components/useOriginalLocation";
 import { useRefToLatest } from "$app/components/useRefToLatest";
@@ -65,7 +65,7 @@ const PublicProfile = (props: Props) => {
       {props.bio || props.tabs.length > 1 ? (
         <header className="grid grid-cols-1 gap-4 border-b border-border px-4 py-8">
           {props.bio ? (
-            <h1 style={{ whiteSpace: "pre-line" }}>
+            <h1 className="whitespace-pre-line">
               <AutoLink text={props.bio} />
             </h1>
           ) : null}
@@ -83,7 +83,9 @@ const PublicProfile = (props: Props) => {
       {sections?.length ? (
         sections.map((section) => <Section key={section.id} section={section} {...props} />)
       ) : (
-        <FollowFormBlock creatorProfile={props.creator_profile} />
+        <SectionLayout className="grid flex-1">
+          <FollowFormBlock creatorProfile={props.creator_profile} />
+        </SectionLayout>
       )}
     </>
   );

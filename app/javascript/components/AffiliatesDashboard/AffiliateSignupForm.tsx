@@ -19,6 +19,7 @@ import { NumberInput } from "$app/components/NumberInput";
 import { AffiliatesNavigation, Layout } from "$app/components/server-components/AffiliatesPage";
 import { showAlert } from "$app/components/server-components/Alert";
 import { ToggleSettingRow } from "$app/components/SettingRow";
+import Placeholder from "$app/components/ui/Placeholder";
 import { WithTooltip } from "$app/components/WithTooltip";
 
 import placeholderImage from "$assets/images/placeholders/affiliate-signup-form.png";
@@ -99,8 +100,8 @@ export const AffiliateSignupForm = () => {
       }
     >
       {products.length === 0 ? (
-        <section className="!p-4 md:!p-8">
-          <div className="placeholder">
+        <section className="p-4! md:p-8!">
+          <Placeholder>
             <figure>
               <img src={placeholderImage} />
             </figure>
@@ -113,11 +114,11 @@ export const AffiliateSignupForm = () => {
             >
               New product
             </NavigationButton>
-          </div>
+          </Placeholder>
         </section>
       ) : (
         <form>
-          <section className="!p-4 md:!p-8">
+          <section className="p-4! md:p-8!">
             <header>
               <h2>Affiliate link</h2>
               <div>
@@ -143,7 +144,7 @@ export const AffiliateSignupForm = () => {
                 />
                 {enableAffiliateLink ? (
                   <CopyToClipboard text={affiliateRequestUrl}>
-                    <button type="button" className="link">
+                    <button type="button" className="underline">
                       Copy link
                     </button>
                   </CopyToClipboard>
@@ -156,7 +157,7 @@ export const AffiliateSignupForm = () => {
               )}
             </fieldset>
           </section>
-          <section className="!p-4 md:!p-8">
+          <section className="p-4! md:p-8!">
             <header>
               <h2>Affiliate products</h2>
               <p>Enable specific products you want your affiliates to earn a commission with.</p>
@@ -183,7 +184,7 @@ export const AffiliateSignupForm = () => {
               </tbody>
             </table>
           </section>
-          <section className="!p-4 md:!p-8">
+          <section className="p-4! md:p-8!">
             <header>
               <h2>Gumroad Affiliate Program</h2>
               <div>

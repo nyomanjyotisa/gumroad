@@ -18,6 +18,7 @@ import { useLoggedInUser } from "$app/components/LoggedInUser";
 import { showAlert } from "$app/components/server-components/Alert";
 import { Layout as SettingsLayout } from "$app/components/Settings/Layout";
 import { TypeSafeOptionSelect } from "$app/components/TypeSafeOptionSelect";
+import Placeholder from "$app/components/ui/Placeholder";
 
 type Products = { permalink: string; name: string }[];
 type Props = {
@@ -68,7 +69,7 @@ const ThirdPartyAnalyticsPage = ({ settings_pages, third_party_analytics, produc
       canUpdate={loggedInUser?.policies.settings_third_party_analytics_user.update || false}
     >
       <form>
-        <section className="!p-4 md:!p-8">
+        <section className="p-4! md:p-8!">
           <header>
             <h2>Third-party analytics</h2>
             <a href="/help/article/174-third-party-analytics" target="_blank" rel="noreferrer">
@@ -135,7 +136,7 @@ const ThirdPartyAnalyticsPage = ({ settings_pages, third_party_analytics, produc
             </div>
           </Details>
         </section>
-        <section className="!p-4 md:!p-8">
+        <section className="p-4! md:p-8!">
           <header>
             <h2>Domain verification</h2>
           </header>
@@ -175,7 +176,7 @@ const ThirdPartyAnalyticsPage = ({ settings_pages, third_party_analytics, produc
             </div>
           </Details>
         </section>
-        <section className="!p-4 md:!p-8">
+        <section className="p-4! md:p-8!">
           <header>
             <h2>Snippets</h2>
             <div>Add custom JavaScript to pages in the checkout flow.</div>
@@ -199,7 +200,7 @@ const ThirdPartyAnalyticsPage = ({ settings_pages, third_party_analytics, produc
               {addSnippetButton}
             </>
           ) : (
-            <div className="placeholder">{addSnippetButton}</div>
+            <Placeholder>{addSnippetButton}</Placeholder>
           )}
         </section>
       </form>

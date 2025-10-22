@@ -3,7 +3,7 @@ import { createCast } from "ts-safe-cast";
 
 import { register } from "$app/utils/serverComponentUtil";
 
-import { Form } from "$app/components/Admin/Form";
+import { Form } from "$app/components/server-components/Admin/Form";
 import { showAlert } from "$app/components/server-components/Alert";
 
 export const AdminPausePayoutsForm = ({
@@ -38,7 +38,7 @@ export const AdminPausePayoutsForm = ({
             ) : payouts_paused_by === "stripe" ? (
               <p>Payouts are currently paused by Stripe because of pending verification requirements.</p>
             ) : (
-              <div className="override grid gap-2">
+              <div className="grid gap-2">
                 {payouts_paused_by === "user" && <p>Payouts are currently paused by the creator.</p>}
                 <textarea
                   name="pause_payouts[reason]"
