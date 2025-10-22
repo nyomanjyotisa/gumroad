@@ -13,7 +13,7 @@ class CustomersController < Sellers::BaseController
   def index
     product = Link.fetch(params[:link_id]) if params[:link_id].present?
     sales = fetch_sales(products: [product].compact)
-    @customers_presenter = CustomersPresenter.new(
+    customers_presenter = CustomersPresenter.new(
       pundit_user:,
       product:,
       customers: load_sales(sales),
@@ -22,8 +22,8 @@ class CustomersController < Sellers::BaseController
     )
     create_user_event("customers_view")
 
-    render inertia: "Customers/index",
-           props: { customers_presenter: @customers_presenter.customers_props }
+    render inertia: "Customers/Index",
+           props: { customers_presenter: customers_presenter.customers_props }
   end
 
   def paged
@@ -171,9 +171,12 @@ class CustomersController < Sellers::BaseController
           :tip,
           :upsell_purchase,
           :variant_attributes,
+          :url_redirect,
+          :link,
           product_review: [:response, { alive_videos: [:video_file] }],
           utm_link: [target_resource: [:seller, :user]]
         )
+        .in_order_of(:id, sales.records.ids)
         .load
     end
 

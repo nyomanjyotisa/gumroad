@@ -5,6 +5,7 @@ import { createCast, is } from "ts-safe-cast";
 import { deletePurchasedProduct, setPurchaseArchived } from "$app/data/library";
 import { ProductNativeType } from "$app/parsers/product";
 import { assertDefined } from "$app/utils/assert";
+import { classNames } from "$app/utils/classNames";
 import { asyncVoid } from "$app/utils/promise";
 import { assertResponseError } from "$app/utils/request";
 import { register } from "$app/utils/serverComponentUtil";
@@ -20,6 +21,8 @@ import { AuthorByline } from "$app/components/Product/AuthorByline";
 import { Thumbnail } from "$app/components/Product/Thumbnail";
 import { Select } from "$app/components/Select";
 import { showAlert } from "$app/components/server-components/Alert";
+import Placeholder from "$app/components/ui/Placeholder";
+import { ProductCardGrid } from "$app/components/ui/ProductCardGrid";
 import { useAddThirdPartyAnalytics } from "$app/components/useAddThirdPartyAnalytics";
 import { useGlobalEventListener } from "$app/components/useGlobalEventListener";
 import { useIsAboveBreakpoint } from "$app/components/useIsAboveBreakpoint";
@@ -328,6 +331,8 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
     if (e.key === "Enter") dispatch({ type: "update-search", search: { query: enteredQuery } });
   };
 
+  const shouldShowFilter = !showArchivedNotice && (hasParams || archivedCount > 0 || state.results.length > 9);
+
   return (
     <Layout
       selectedTab="purchases"
@@ -337,7 +342,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
     >
       <section className="space-y-4 p-4 md:p-8">
         {state.results.length === 0 || showArchivedNotice ? (
-          <div className="placeholder">
+          <Placeholder>
             {state.results.length === 0 ? (
               <figure>
                 <img src={placeholder} />
@@ -365,7 +370,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
                 </Button>
               </>
             )}
-          </div>
+          </Placeholder>
         ) : null}
         {archivedCount > 0 && !state.search.showArchivedOnly && !showArchivedNotice ? (
           <div role="status" className="info mb-5">
@@ -373,7 +378,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
               You have {archivedCount} archived purchase{archivedCount === 1 ? "" : "s"}.{" "}
               <button
                 type="button"
-                className="link"
+                className="underline"
                 onClick={() => dispatch({ type: "update-search", search: { showArchivedOnly: true } })}
               >
                 Click here to view
@@ -381,8 +386,13 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
             </span>
           </div>
         ) : null}
-        <div className="with-sidebar">
-          {!showArchivedNotice && (hasParams || archivedCount > 0 || state.results.length > 9) ? (
+        <div
+          className={classNames(
+            "grid grid-cols-1 items-start gap-x-16 gap-y-8",
+            shouldShowFilter && "lg:grid-cols-[var(--grid-cols-sidebar)]",
+          )}
+        >
+          {shouldShowFilter ? (
             <div className="stack">
               <header>
                 <div>
@@ -391,7 +401,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
                     : "No products found"}
                 </div>
                 {isDesktop ? null : (
-                  <button className="link" onClick={() => setMobileFiltersExpanded(!mobileFiltersExpanded)}>
+                  <button className="underline" onClick={() => setMobileFiltersExpanded(!mobileFiltersExpanded)}>
                     Filter
                   </button>
                 )}
@@ -491,7 +501,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
                       ))}
                       <div>
                         {creators.length > 5 && !showingAllCreators ? (
-                          <button className="link" onClick={() => setShowingAllCreators(true)}>
+                          <button className="underline" onClick={() => setShowingAllCreators(true)}>
                             Show more
                           </button>
                         ) : null}
@@ -522,7 +532,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
               ) : null}
             </div>
           ) : null}
-          <div className="product-card__column product-card__grid product-card-grid">
+          <ProductCardGrid>
             {filteredResults.slice(0, resultsLimit).map((result) => (
               <Card
                 key={result.purchase.id}
@@ -537,7 +547,7 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
                 onDelete={(confirm = true) => (confirm ? setDeleting(result) : deletePurchase(result))}
               />
             ))}
-          </div>
+          </ProductCardGrid>
         </div>
         <DeleteProductModal
           deleting={deleting}
