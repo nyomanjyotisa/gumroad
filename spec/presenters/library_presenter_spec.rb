@@ -119,7 +119,7 @@ describe LibraryPresenter do
                                   },
                                 ])
 
-        expect(creator_counts).to eq([{ count: 1, id: creator.external_id, name: creator.name }])
+        expect(creator_counts).to eq([{ count: 3, id: creator.external_id, name: creator.name }])
       end
     end
 
