@@ -264,6 +264,29 @@ describe("Library Scenario", type: :system, js: true) do
     expect(page).to have_status(text: "You have 2 archived purchases. Click here to view")
   end
 
+  it "hides filter section when last archived product is deleted" do
+    product = create(:product, name: "Test Product")
+    purchase = create(:purchase, purchaser: @user, link: product, is_archived: true)
+    Link.import(refresh: true, force: true)
+
+    visit "/library?show_archived_only=true"
+
+    expect(page).to have_product_card(purchase.link)
+    expect(page).to have_field("Sort by")
+
+    within find_product_card(purchase.link).hover do
+      find_and_click "[aria-label='Open product action menu']"
+      click_on "Delete"
+    end
+    expect(page).to have_text("Are you sure you want to delete #{purchase.link_name}?")
+    click_on "Confirm"
+
+    wait_for_ajax
+
+    expect(page).to have_text("You haven't bought anything... yet!")
+    expect(page).to_not have_field("Sort by")
+  end
+
   it "lists the same product several times if purchased several times" do
     products = create_list(:product, 2, name: "MyProduct")
     category = create(:variant_category, link: products[0])

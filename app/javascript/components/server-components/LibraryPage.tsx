@@ -331,7 +331,8 @@ const LibraryPage = ({ results, creators, bundles, reviews_page_enabled, followi
     if (e.key === "Enter") dispatch({ type: "update-search", search: { query: enteredQuery } });
   };
 
-  const shouldShowFilter = !showArchivedNotice && (hasParams || archivedCount > 0 || state.results.length > 9);
+  const shouldShowFilter =
+    !showArchivedNotice && (hasParams || archivedCount > 0 || state.results.length > 9) && state.results.length > 0;
 
   return (
     <Layout
