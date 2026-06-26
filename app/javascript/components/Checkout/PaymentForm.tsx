@@ -39,6 +39,7 @@ import {
   getErrors,
   getTotalPrice,
   hasShipping,
+  isPaymentElementEligible,
   isProcessing,
   isSubmitDisabled,
   PaymentMethodType,
@@ -47,6 +48,7 @@ import {
   usePayLabel,
   useState,
 } from "$app/components/Checkout/payment";
+import { PaymentElementCardContent } from "$app/components/Checkout/PaymentElementForm";
 import { Dropdown } from "$app/components/Dropdown";
 import { LoadingSpinner } from "$app/components/LoadingSpinner";
 import { useLoggedInUser } from "$app/components/LoggedInUser";
@@ -1169,7 +1171,7 @@ const PaymentMethodsSection = ({
         )}
         {state.paymentMethod === "card" ? (
           <div className={hasMultiplePaymentMethods ? "bg-body p-4 pt-0" : "bg-body px-4 pb-4"}>
-            <CreditCardContent />
+            {isPaymentElementEligible(state) ? <PaymentElementCardContent /> : <CreditCardContent />}
           </div>
         ) : null}
         {isPayPalAvailable ? (

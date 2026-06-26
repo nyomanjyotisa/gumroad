@@ -146,6 +146,24 @@ export function requiresReusablePaymentMethod(state: State) {
   );
 }
 
+// Stripe rejects card charges below the minimum chargeable amount (50 cents for USD).
+const STRIPE_MINIMUM_CHARGE_CENTS = 50;
+
+// Phase 1 of the Stripe Payment Element migration (issue #5362): conservatively route only
+// single-seller, card-only, charged purchases through the Payment Element. Everything else
+// (saved cards, multi-seller, subscriptions, commissions, installments, free/setup-only carts,
+// below-minimum or not-yet-loaded amounts) keeps using the existing CardElement path. The
+// seller-scoped feature flag is decided on the server and carried in `creator.payment_element_enabled`.
+export function isPaymentElementEligible(state: State) {
+  if (!requiresPayment(state)) return false;
+  if (requiresReusablePaymentMethod(state)) return false;
+  if (state.savedCreditCard) return false;
+  if (state.products.some((product) => product.payInInstallments)) return false;
+  if (!state.products[0]?.creator.payment_element_enabled) return false;
+  const total = getTotalPrice(state);
+  return total !== null && total >= STRIPE_MINIMUM_CHARGE_CENTS;
+}
+
 export function isProcessing(state: State) {
   return state.status.type !== "input";
 }

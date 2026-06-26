@@ -20,7 +20,13 @@ import {
   hasMetDiscountConditions,
 } from "$app/components/Product/ConfigurationSelector";
 
-export type Creator = { name: string; profile_url: string; avatar_url: string; id: string };
+export type Creator = {
+  name: string;
+  profile_url: string;
+  avatar_url: string;
+  id: string;
+  payment_element_enabled?: boolean;
+};
 export type Product = {
   id: string;
   permalink: string;

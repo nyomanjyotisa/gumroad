@@ -1,4 +1,4 @@
-import { PaymentRequestPaymentMethodEvent, StripeCardElement } from "@stripe/stripe-js";
+import { PaymentRequestPaymentMethodEvent, Stripe, StripeCardElement, StripeElements } from "@stripe/stripe-js";
 import typia from "typia";
 
 import {
@@ -34,6 +34,39 @@ export const prepareCardPaymentMethodData = async (
     type: "card",
     card: cardData.cardElement,
     billing_details: { address: { postal_code: cardData.zipCode ?? "" }, email: cardData.email },
+  });
+
+  if (paymentMethodResult.error) {
+    return { status: "error", stripe_error: paymentMethodResult.error };
+  }
+  return {
+    status: "success",
+    type: "card",
+    reusable: false,
+    stripe_payment_method_id: paymentMethodResult.paymentMethod.id,
+    card_country: paymentMethodResult.paymentMethod.card?.country ?? null,
+    card_country_source: "stripe",
+  };
+};
+
+// Phase 1 of the Stripe Payment Element migration (issue #5362): create the PaymentMethod from a
+// Payment Element via the deferred-intent flow (`stripe.createPaymentMethod({ elements })`) and map it
+// into the same `CardPaymentMethodParams` shape the CardElement path produces, so the backend payload
+// (`stripe_payment_method_id`, `card_country`) is unchanged.
+export const prepareCardPaymentMethodDataFromElements = async (data: {
+  stripe: Stripe;
+  elements: StripeElements;
+  email: string;
+  zipCode?: string;
+}): Promise<CardPaymentMethodParams | StripeErrorParams> => {
+  const { error: submitError } = await data.elements.submit();
+  if (submitError) {
+    return { status: "error", stripe_error: submitError };
+  }
+
+  const paymentMethodResult = await data.stripe.createPaymentMethod({
+    elements: data.elements,
+    params: { billing_details: { address: { postal_code: data.zipCode ?? "" }, email: data.email } },
   });
 
   if (paymentMethodResult.error) {
