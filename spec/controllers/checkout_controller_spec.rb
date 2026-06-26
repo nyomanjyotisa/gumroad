@@ -26,6 +26,11 @@ describe CheckoutController, type: :controller, inertia: true do
                                                address: nil,
                                                ca_provinces: Compliance::Countries.subdivisions_for_select(Compliance::Countries::CAN.alpha2).map(&:first),
                                                cart_save_debounce_ms: CheckoutPresenter::CART_SAVE_DEBOUNCE_DURATION_IN_SECONDS.in_milliseconds,
+                                               checkout_payment: {
+                                                 integration: Checkout::StripePaymentPresenter::STRIPE_CARD_ELEMENT_INTEGRATION,
+                                                 fallback_reason: "stripe_payment_element_flag_disabled",
+                                                 elements_options: nil,
+                                               },
                                                clear_cart: false,
                                                countries: Compliance::Countries.for_select.to_h,
                                                country: nil,

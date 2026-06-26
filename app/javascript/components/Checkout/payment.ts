@@ -21,6 +21,22 @@ enableMapSet();
 
 export type PaymentMethodType = "paypal" | "stripePaymentRequest" | "card";
 export type PaymentMethod = { type: PaymentMethodType; button: React.ReactElement | null };
+export type CheckoutPaymentConfig =
+  | {
+      integration: "card_element";
+      fallback_reason: string;
+      elements_options: null;
+    }
+  | {
+      integration: "payment_element";
+      fallback_reason: null;
+      elements_options: {
+        mode: "payment";
+        currency: "usd";
+        payment_method_types: ["card"];
+        payment_method_creation: "manual";
+      };
+    };
 
 export type Product = {
   permalink: string;
@@ -74,6 +90,7 @@ export type State = {
   availablePaymentMethods: PaymentMethod[];
   paymentMethod: PaymentMethodType;
   savedCreditCard: SavedCreditCard | null;
+  checkoutPayment: CheckoutPaymentConfig;
   status:
     | { type: "input"; errors: Set<string> }
     | { type: "offering" }
@@ -144,6 +161,25 @@ export function requiresReusablePaymentMethod(state: State) {
     !!state.products[0]?.subscription_id ||
     state.products[0]?.nativeType === "commission"
   );
+}
+
+export function canUseStripePaymentElement(state: State) {
+  if (state.surcharges.type === "loaded" && !getTotalPrice(state)) return false;
+
+  return (
+    state.checkoutPayment.integration === "payment_element" &&
+    !state.savedCreditCard &&
+    !requiresReusablePaymentMethod(state) &&
+    !state.products.some(
+      (product) => product.payInInstallments || product.hasFreeTrial || product.nativeType === "commission",
+    )
+  );
+}
+
+export function getStripePaymentElementAmount(state: State) {
+  if (!canUseStripePaymentElement(state) || state.surcharges.type !== "loaded") return null;
+  const total = getTotalPrice(state);
+  return total && total > 0 ? total : null;
 }
 
 export function isProcessing(state: State) {
@@ -263,6 +299,7 @@ export function createReducer(initial: {
   paypalClientId: string;
   gift: Gift | null;
   requireEmailTypoAcknowledgment: boolean;
+  checkoutPayment?: CheckoutPaymentConfig;
 }): readonly [State, React.Dispatch<PublicAction>] {
   const url = new URL(useOriginalLocation());
   function validatePaymentMethodIndependentFields(state: State) {
@@ -401,6 +438,11 @@ export function createReducer(initial: {
         surcharges: { type: "pending" },
         saveAddress: !!initial.address,
         gift: initial.gift,
+        checkoutPayment: initial.checkoutPayment ?? {
+          integration: "card_element",
+          fallback_reason: "not_checkout",
+          elements_options: null,
+        },
         paymentMethod: "card",
         tip: { type: "percentage", percentage: initial.defaultTipOption },
         status: { type: "input", errors: new Set() },

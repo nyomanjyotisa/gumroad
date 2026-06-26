@@ -1,0 +1,182 @@
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import {
+  Stripe,
+  StripeElements,
+  StripeElementsOptions,
+  StripePaymentElementChangeEvent,
+  StripePaymentElementOptions,
+} from "@stripe/stripe-js";
+import * as React from "react";
+
+import { getStripeInstance } from "$app/utils/stripe_loader";
+import { getCssVariable } from "$app/utils/styles";
+
+import { useFont } from "$app/components/DesignSettings";
+import { LoadingSpinner } from "$app/components/LoadingSpinner";
+import { Fieldset } from "$app/components/ui/Fieldset";
+
+export type PaymentElementController = { stripe: Stripe; elements: StripeElements };
+export type PaymentElementConfig = {
+  mode: "payment";
+  currency: "usd";
+  payment_method_types: ["card"];
+  payment_method_creation: "manual";
+};
+
+type PaymentElementWallets = NonNullable<StripePaymentElementOptions["wallets"]> & { link?: "auto" | "never" };
+
+const PAYMENT_ELEMENT_WALLETS: PaymentElementWallets = {
+  applePay: "never",
+  googlePay: "never",
+  link: "never",
+};
+
+export const PaymentElementInput = ({
+  amount,
+  elementsOptions,
+  disabled,
+  invalid,
+  onReady,
+  onChange,
+}: {
+  amount: number | null;
+  elementsOptions: PaymentElementConfig;
+  disabled?: boolean | undefined;
+  invalid?: boolean;
+  onReady: (controller: PaymentElementController | null) => void;
+  onChange?: ((event: StripePaymentElementChangeEvent) => void) | undefined;
+}) => (
+  <Fieldset state={invalid ? "danger" : undefined} aria-label="Card information">
+    {amount ? (
+      <StripePaymentElementProvider amount={amount} elementsOptions={elementsOptions}>
+        <PaymentElementControllerInput disabled={disabled} onReady={onReady} onChange={onChange} />
+      </StripePaymentElementProvider>
+    ) : (
+      <div className="bg-input flex min-h-16 items-center justify-center rounded border border-border p-4">
+        <LoadingSpinner />
+      </div>
+    )}
+  </Fieldset>
+);
+
+const PaymentElementControllerInput = ({
+  disabled,
+  onReady,
+  onChange,
+}: {
+  disabled?: boolean | undefined;
+  onReady: (controller: PaymentElementController | null) => void;
+  onChange?: ((event: StripePaymentElementChangeEvent) => void) | undefined;
+}) => {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  React.useEffect(() => {
+    onReady(stripe && elements ? { stripe, elements } : null);
+  }, [stripe, elements]);
+
+  return (
+    <PaymentElement
+      options={{
+        readOnly: disabled ?? false,
+        // Card-only rollout: tabs let us hide Stripe's single-method selector. Use a visible layout when enabling multiple Payment Element methods.
+        layout: { type: "tabs" },
+        fields: {
+          billingDetails: {
+            name: "never",
+            email: "never",
+            phone: "never",
+            address: {
+              country: "never",
+              postalCode: "never",
+              state: "never",
+              city: "never",
+              line1: "never",
+              line2: "never",
+            },
+          },
+        },
+        wallets: PAYMENT_ELEMENT_WALLETS,
+      }}
+      {...(onChange ? { onChange } : {})}
+    />
+  );
+};
+
+const StripePaymentElementProvider = ({
+  amount,
+  elementsOptions,
+  children,
+}: {
+  amount: number;
+  elementsOptions: PaymentElementConfig;
+  children: React.ReactNode;
+}) => {
+  const [stripePromise] = React.useState(getStripeInstance);
+  const font = useFont();
+  const color = getCssVariable("color").split(" ").join(",");
+  const backgroundColor = `rgb(${getCssVariable("filled").split(" ").join(",")})`;
+  const borderColor = `rgb(${color}, ${getCssVariable("gray-2")})`;
+  const placeholderColor = `rgb(${color}, ${getCssVariable("gray-3")})`;
+  const fontFamily = `${font.name}, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+
+  const options = React.useMemo<StripeElementsOptions>(
+    () => ({
+      mode: elementsOptions.mode,
+      currency: elementsOptions.currency,
+      amount,
+      paymentMethodTypes: elementsOptions.payment_method_types,
+      paymentMethodCreation: elementsOptions.payment_method_creation,
+      fonts: [{ family: font.name, src: `url(${font.url})` }],
+      appearance: {
+        variables: {
+          fontFamily,
+          fontSizeBase: "1rem",
+          fontSizeSm: "0.875rem",
+          fontLineHeight: "1.35",
+          spacingUnit: "0.25rem",
+          gridRowSpacing: "0.75rem",
+          gridColumnSpacing: "1rem",
+          colorText: `rgb(${color})`,
+          colorTextPlaceholder: placeholderColor,
+          colorBackground: backgroundColor,
+          colorDanger: "#df1b41",
+          borderRadius: "4px",
+          focusOutline: `2px solid rgb(${getCssVariable("accent").split(" ").join(",")})`,
+          focusBoxShadow: "none",
+        },
+        rules: {
+          ".Tab": {
+            display: "none",
+          },
+          ".TabLabel": {
+            fontSize: "1rem",
+            fontWeight: "400",
+          },
+          ".Input": {
+            borderColor,
+            boxShadow: "none",
+            minHeight: "3rem",
+            padding: "0.75rem 1rem",
+          },
+          ".Input:focus": {
+            borderColor: `rgb(${color})`,
+            boxShadow: "none",
+          },
+          ".Label": {
+            color: `rgb(${color})`,
+            fontSize: "1rem",
+            fontWeight: "400",
+          },
+        },
+      },
+    }),
+    [amount, backgroundColor, borderColor, color, elementsOptions, font.name, font.url, fontFamily, placeholderColor],
+  );
+
+  return (
+    <Elements key={amount} stripe={stripePromise} options={options}>
+      {children}
+    </Elements>
+  );
+};

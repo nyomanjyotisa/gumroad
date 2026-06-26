@@ -6,9 +6,12 @@ class CheckoutController < ApplicationController
   before_action :process_cart_id_param, only: [:show]
 
   def show
+    cart_presenter = CartPresenter.new(logged_in_user:, ip: request.remote_ip, browser_guid: cookies[:_gumroad_guid])
+    checkout_presenter = CheckoutPresenter.new(logged_in_user:, ip: request.remote_ip)
+
     render inertia: "Checkout/Show", props: {
-      cart: -> { CartPresenter.new(logged_in_user:, ip: request.remote_ip, browser_guid: cookies[:_gumroad_guid]).cart_props },
-      checkout: -> { CheckoutPresenter.new(logged_in_user:, ip: request.remote_ip).checkout_props(params: checkout_params, browser_guid: cookies[:_gumroad_guid]) },
+      cart: -> { cart_presenter.cart_props },
+      checkout: -> { checkout_presenter.checkout_props(params: checkout_params, browser_guid: cookies[:_gumroad_guid], cart: cart_presenter.cart) },
       recommended_products: InertiaRails.optional { recommended_products },
     }
   end

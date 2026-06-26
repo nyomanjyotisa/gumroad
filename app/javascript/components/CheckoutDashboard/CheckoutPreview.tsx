@@ -39,6 +39,11 @@ export const CheckoutPreview = ({
         countries: { US: "United States" },
         tipOptions: [0, 15, 20, 25],
         savedCreditCard: null,
+        checkoutPayment: {
+          integration: "card_element",
+          fallback_reason: "checkout_preview",
+          elements_options: null,
+        },
         availablePaymentMethods: [],
         tip: { type: "percentage", percentage: 0 },
         emailTypoSuggestion: null,

@@ -36,7 +36,9 @@ import { CreditCardInput, StripeElementsProvider } from "$app/components/Checkou
 import { CustomFields } from "$app/components/Checkout/CustomFields";
 import {
   addressFields,
+  canUseStripePaymentElement,
   getErrors,
+  getStripePaymentElementAmount,
   getTotalPrice,
   hasShipping,
   isProcessing,
@@ -47,6 +49,7 @@ import {
   usePayLabel,
   useState,
 } from "$app/components/Checkout/payment";
+import { PaymentElementController, PaymentElementInput } from "$app/components/Checkout/PaymentElementInput";
 import { Dropdown } from "$app/components/Dropdown";
 import { LoadingSpinner } from "$app/components/LoadingSpinner";
 import { useLoggedInUser } from "$app/components/LoggedInUser";
@@ -659,10 +662,17 @@ const CreditCardContent = () => {
   const isLoggedIn = !!useLoggedInUser();
 
   const cardElementRef = React.useRef<StripeCardElement | null>(null);
+  const paymentElementRef = React.useRef<PaymentElementController | null>(null);
   const [useSavedCard, setUseSavedCard] = React.useState(!!state.savedCreditCard);
   const [keepOnFile, setKeepOnFile] = React.useState(isLoggedIn);
 
   const [cardError, setCardError] = React.useState(false);
+  const useStripePaymentElement = canUseStripePaymentElement(state);
+  const stripePaymentElementConfig =
+    useStripePaymentElement && state.checkoutPayment.integration === "payment_element"
+      ? state.checkoutPayment.elements_options
+      : null;
+  const stripePaymentElementAmount = getStripePaymentElementAmount(state);
 
   React.useEffect(() => {
     dispatch({
@@ -677,24 +687,44 @@ const CreditCardContent = () => {
   React.useEffect(() => {
     if (state.status.type !== "starting" || state.paymentMethod !== "card") return;
     (async () => {
-      if (!useSavedCard && !cardElementRef.current) {
+      if (!useSavedCard && useStripePaymentElement && !paymentElementRef.current) {
+        setCardError(true);
+        return dispatch({ type: "cancel" });
+      }
+      if (!useSavedCard && !useStripePaymentElement && !cardElementRef.current) {
         setCardError(true);
         return dispatch({ type: "cancel" });
       }
       const selectedPaymentMethod: SelectedPaymentMethod = useSavedCard
         ? { type: "saved" }
-        : {
-            type: "card",
-            element: assertDefined(
-              cardElementRef.current,
-              "`cardElementRef.current` should be defined when the payment method is an unsaved card",
-            ),
-            zipCode: state.zipCode,
-            keepOnFile,
-            email: state.email,
-          };
+        : useStripePaymentElement
+          ? {
+              type: "payment-element",
+              ...assertDefined(
+                paymentElementRef.current,
+                "`paymentElementRef.current` should be defined when the payment method is a Payment Element card",
+              ),
+              zipCode: state.zipCode,
+              keepOnFile,
+              email: state.email,
+              fullName: state.fullName,
+              country: state.country,
+              state: state.state,
+              city: state.city,
+              address: state.address,
+            }
+          : {
+              type: "card",
+              element: assertDefined(
+                cardElementRef.current,
+                "`cardElementRef.current` should be defined when the payment method is an unsaved card",
+              ),
+              zipCode: state.zipCode,
+              keepOnFile,
+              email: state.email,
+            };
 
-      const paymentMethod = await (requiresReusablePaymentMethod(state)
+      const paymentMethod = await (!useStripePaymentElement && requiresReusablePaymentMethod(state)
         ? getReusablePaymentMethodResult(selectedPaymentMethod, { products: state.products })
         : getPaymentMethodResult(selectedPaymentMethod));
 
@@ -708,20 +738,33 @@ const CreditCardContent = () => {
       }
       dispatch({ type: "set-payment-method", paymentMethod });
     })().catch(fail);
-  }, [state.status.type]);
+  }, [state.status.type, useStripePaymentElement]);
 
   return (
     <div className="flex flex-col gap-4">
-      <CreditCardInput
-        savedCreditCard={state.savedCreditCard}
-        disabled={isProcessing(state)}
-        onReady={(element) => (cardElementRef.current = element)}
-        invalid={cardError}
-        useSavedCard={useSavedCard}
-        setUseSavedCard={setUseSavedCard}
-        onChange={(evt) => setCardError(!!evt.error)}
-        enableLink
-      />
+      {stripePaymentElementConfig ? (
+        <PaymentElementInput
+          amount={stripePaymentElementAmount}
+          elementsOptions={stripePaymentElementConfig}
+          disabled={isProcessing(state)}
+          onReady={(controller) => (paymentElementRef.current = controller)}
+          invalid={cardError}
+          onChange={(evt) => {
+            if (evt.complete) setCardError(false);
+          }}
+        />
+      ) : (
+        <CreditCardInput
+          savedCreditCard={state.savedCreditCard}
+          disabled={isProcessing(state)}
+          onReady={(element) => (cardElementRef.current = element)}
+          invalid={cardError}
+          useSavedCard={useSavedCard}
+          setUseSavedCard={setUseSavedCard}
+          onChange={(evt) => setCardError(!!evt.error)}
+          enableLink
+        />
+      )}
       {!useSavedCard && isLoggedIn ? (
         <Label className="flex items-center gap-2">
           <Checkbox
@@ -1155,6 +1198,16 @@ const PaymentMethodsSection = ({
   const { canPay, isGooglePay } = useStripePaymentRequest();
 
   const hasMultiplePaymentMethods = isPayPalAvailable || canPay;
+  const useStripePaymentElement = canUseStripePaymentElement(state);
+
+  if (useStripePaymentElement && !hasMultiplePaymentMethods) {
+    return (
+      <>
+        <CreditCardContent />
+        {state.paymentMethod === "card" ? <CreditCardPayButtonContent isTestPurchase={isTestPurchase} /> : null}
+      </>
+    );
+  }
 
   return (
     <>
