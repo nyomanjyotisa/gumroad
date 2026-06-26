@@ -158,7 +158,6 @@ export function isPaymentElementEligible(state: State) {
   if (!requiresPayment(state)) return false;
   if (requiresReusablePaymentMethod(state)) return false;
   if (state.savedCreditCard) return false;
-  if (state.products.some((product) => product.payInInstallments)) return false;
   if (!state.products[0]?.creator.payment_element_enabled) return false;
   const total = getTotalPrice(state);
   return total !== null && total >= STRIPE_MINIMUM_CHARGE_CENTS;
