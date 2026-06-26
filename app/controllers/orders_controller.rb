@@ -22,7 +22,7 @@ class OrdersController < ApplicationController
       params: order_params
     ).perform
 
-    charge_responses = Order::ChargeService.new(order:, params: order_params).perform
+    charge_responses = Order::ChargeService.new(order:, params: order_params, checkout_surface: params[:checkout_surface]).perform
 
     if order.persisted? && order.purchases.successful.any? && UtmLinkVisit.where(browser_guid: order_params[:browser_guid]).any?
       UtmLinkSaleAttributionJob.perform_async(order.id, order_params[:browser_guid])
@@ -114,7 +114,7 @@ class OrdersController < ApplicationController
         :save_shipping_address, :card_expiry_month, :card_expiry_year, :stripe_status, :visual,
         :billing_agreement_id, :paypal_order_id, :stripe_payment_method_id, :stripe_customer_id, :stripe_setup_intent_id, :stripe_error,
         :braintree_transient_customer_store_key, :braintree_device_data, :use_existing_card, :paymentToken,
-        :url_parameters, :is_gift, :giftee_email, :giftee_id, :gift_note, :referrer, :checkout_surface,
+        :url_parameters, :is_gift, :giftee_email, :giftee_id, :gift_note, :referrer,
         purchase: [:full_name, :street_address, :city, :state, :zip_code, :country],
         # Individual purchase params
         line_items: [:uid, :permalink, :perceived_price_cents, :price_range, :discount_code, :is_preorder, :quantity, :call_start_time,
