@@ -149,19 +149,30 @@ export function requiresReusablePaymentMethod(state: State) {
 // Stripe rejects card charges below the minimum chargeable amount (50 cents for USD).
 const STRIPE_MINIMUM_CHARGE_CENTS = 50;
 
-// Phase 1 of the Stripe Payment Element migration (issue #5362): conservatively route only
-// single-seller, card-only, charged purchases through the Payment Element. Everything else
-// (saved cards, multi-seller, subscriptions, commissions, installments, free/setup-only carts,
-// below-minimum or not-yet-loaded amounts) keeps using the existing CardElement path. The
-// seller-scoped feature flag is decided on the server and carried in `creator.payment_element_enabled`.
+// Single source of truth for which card carts use the Stripe Payment Element vs the legacy
+// CardElement (issue #5362). The seller-scoped flag is decided on the server and carried in
+// `creator.payment_element_enabled`; this is card-only (no automatic_payment_methods / local
+// methods, which are later phases). Cases — all card, single or multi seller:
+//   - saved cards: eligible (the component keeps the saved-card toggle)
+//   - reusable carts (multi-seller, managed subscriptions, commissions): eligible, setup mode
+//   - free trials: eligible, setup mode (card collected now, charged after the trial)
+//   - one-time charges incl. preorders, new subscriptions, installments: eligible, payment mode
+//   - fully-free carts, below-minimum amounts, not-yet-loaded amounts, any unflagged seller: not eligible
 export function isPaymentElementEligible(state: State) {
-  if (!requiresPayment(state)) return false;
-  if (requiresReusablePaymentMethod(state)) return false;
-  if (state.savedCreditCard) return false;
-  if (state.products.some((product) => product.payInInstallments)) return false;
-  if (!state.products[0]?.creator.payment_element_enabled) return false;
+  if (state.products.length === 0) return false;
+  if (!state.products.every((product) => product.creator.payment_element_enabled)) return false;
   const total = getTotalPrice(state);
-  return total !== null && total >= STRIPE_MINIMUM_CHARGE_CENTS;
+  if (total === null) return false;
+  if (requiresReusablePaymentMethod(state)) return true;
+  if (total === 0) return state.products.every((product) => product.hasFreeTrial);
+  return total >= STRIPE_MINIMUM_CHARGE_CENTS;
+}
+
+// Reusable carts and free trials collect the card via a SetupIntent (no immediate charge), so the
+// Payment Element mounts in setup mode; everything else charges the cart total now (payment mode).
+export function paymentElementMode(state: State): "payment" | "setup" {
+  if (requiresReusablePaymentMethod(state)) return "setup";
+  return getTotalPrice(state) === 0 ? "setup" : "payment";
 }
 
 export function isProcessing(state: State) {

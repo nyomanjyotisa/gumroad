@@ -106,6 +106,14 @@ class Order::ChargeService
     end
   end
 
+  # Trust the client's reported checkout surface only when the server agrees the seller is
+  # Payment Element-eligible; otherwise record the CardElement fallback. Keeps the checkout_surface
+  # metric server-authoritative (issue #5362).
+  def authoritative_checkout_surface(seller)
+    return checkout_surface unless checkout_surface == "payment_element"
+    Checkout::PaymentMethodEligibility.for_seller(seller).payment_element_enabled ? checkout_surface : "card_element"
+  end
+
   def create_chargeable_from_params(params)
     card_data_handling_mode = CardParamsHelper.get_card_data_handling_mode(params)
     card_data_handling_error = CardParamsHelper.check_for_errors(params)
@@ -210,7 +218,7 @@ class Order::ChargeService
         off_session:,
         statement_description:,
         mandate_options: setup_future_charges ? mandate_options : nil,
-        checkout_surface:,
+        checkout_surface: authoritative_checkout_surface(seller),
       ).perform
 
       self.charge_intent = charge.charge_intent
