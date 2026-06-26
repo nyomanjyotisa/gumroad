@@ -3,12 +3,13 @@
 class Order::ChargeService
   include Events, Order::ResponseHelpers
 
-  attr_accessor :order, :params, :charge_intent, :setup_intent, :charge_responses
+  attr_accessor :order, :params, :charge_intent, :setup_intent, :charge_responses, :checkout_surface
 
-  def initialize(order:, params:)
+  def initialize(order:, params:, checkout_surface: nil)
     @order = order
     @params = params
     @charge_responses = {}
+    @checkout_surface = checkout_surface
   end
 
   def perform
@@ -209,6 +210,7 @@ class Order::ChargeService
         off_session:,
         statement_description:,
         mandate_options: setup_future_charges ? mandate_options : nil,
+        checkout_surface:,
       ).perform
 
       self.charge_intent = charge.charge_intent

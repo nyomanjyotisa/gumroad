@@ -2,12 +2,12 @@
 
 class Charge::CreateService
   attr_accessor :order, :seller, :merchant_account, :chargeable, :purchases, :amount_cents, :gumroad_amount_cents,
-                :setup_future_charges, :off_session, :statement_description, :charge, :mandate_options
+                :setup_future_charges, :off_session, :statement_description, :charge, :mandate_options, :checkout_surface
 
   def initialize(order:, seller:, merchant_account:, chargeable:,
                  purchases:, amount_cents:, gumroad_amount_cents:,
                  setup_future_charges:, off_session:,
-                 statement_description:, mandate_options: nil)
+                 statement_description:, mandate_options: nil, checkout_surface: nil)
     @order = order
     @seller = seller
     @merchant_account = merchant_account
@@ -19,6 +19,7 @@ class Charge::CreateService
     @off_session = off_session
     @statement_description = statement_description
     @mandate_options = mandate_options
+    @checkout_surface = checkout_surface
   end
 
   def perform
@@ -35,6 +36,9 @@ class Charge::CreateService
       purchase.save!
     end
 
+    metadata = StripeMetadata.build_metadata_large_list(purchases.map(&:external_id), key: :purchases, separator: ",")
+    metadata[:checkout_surface] = checkout_surface if checkout_surface.present?
+
     charge_intent = with_charge_processor_error_handler do
       ChargeProcessor.create_payment_intent_or_charge!(merchant_account,
                                                        chargeable,
@@ -46,7 +50,7 @@ class Charge::CreateService
                                                        transfer_group: charge.id_with_prefix,
                                                        off_session:,
                                                        setup_future_charges:,
-                                                       metadata: StripeMetadata.build_metadata_large_list(purchases.map(&:external_id), key: :purchases, separator: ","),
+                                                       metadata:,
                                                        mandate_options:)
     end
 

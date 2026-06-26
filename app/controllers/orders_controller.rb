@@ -22,7 +22,7 @@ class OrdersController < ApplicationController
       params: order_params
     ).perform
 
-    charge_responses = Order::ChargeService.new(order:, params: order_params).perform
+    charge_responses = Order::ChargeService.new(order:, params: order_params, checkout_surface: params[:checkout_surface]).perform
 
     if order.persisted? && order.purchases.successful.any? && UtmLinkVisit.where(browser_guid: order_params[:browser_guid]).any?
       UtmLinkSaleAttributionJob.perform_async(order.id, order_params[:browser_guid])

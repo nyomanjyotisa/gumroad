@@ -7,6 +7,8 @@ export type CardPaymentMethodParams = {
   stripe_payment_method_id: string;
   card_country: string | null;
   card_country_source: "stripe";
+  // Which checkout UI collected the card, for Stripe-side A/B comparison during the Payment Element rollout.
+  checkout_surface?: "payment_element" | "card_element";
 };
 export type PaymentRequestPaymentMethodParams = {
   wallet_type: string;
