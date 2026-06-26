@@ -156,12 +156,21 @@ const STRIPE_MINIMUM_CHARGE_CENTS = 50;
 // seller-scoped feature flag is decided on the server and carried in `creator.payment_element_enabled`.
 export function isPaymentElementEligible(state: State) {
   if (!requiresPayment(state)) return false;
-  if (requiresReusablePaymentMethod(state)) return false;
   if (state.savedCreditCard) return false;
   if (state.products.some((product) => product.payInInstallments)) return false;
-  if (!state.products[0]?.creator.payment_element_enabled) return false;
+  // Every seller in the cart must have the flag (multi-seller charges each one off a saved pm).
+  if (!state.products.every((product) => product.creator.payment_element_enabled)) return false;
+  // Multi-seller and other reusable carts use the SetupIntent flow (see the reusable branch in
+  // PaymentElementForm) and mount in setup mode, so no immediate above-minimum amount is required.
+  if (requiresReusablePaymentMethod(state)) return true;
   const total = getTotalPrice(state);
   return total !== null && total >= STRIPE_MINIMUM_CHARGE_CENTS;
+}
+
+// Reusable carts (multi-seller, managed subscriptions, commissions) collect the card via a
+// SetupIntent rather than charging immediately, so the Payment Element mounts in setup mode.
+export function paymentElementMode(state: State): "payment" | "setup" {
+  return requiresReusablePaymentMethod(state) ? "setup" : "payment";
 }
 
 export function isProcessing(state: State) {
