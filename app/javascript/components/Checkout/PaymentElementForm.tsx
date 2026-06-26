@@ -1,9 +1,11 @@
+import { CreditCard } from "@boxicons/react";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Appearance } from "@stripe/stripe-js";
 import * as React from "react";
 
 import { prepareCardPaymentMethodDataFromElements } from "$app/data/card_payment_method_data";
 import { AnyPaymentMethodResult } from "$app/data/payment_method_result";
+import { SavedCreditCard } from "$app/parsers/card";
 import { getStripeInstance } from "$app/utils/stripe_loader";
 import { getCssVariable } from "$app/utils/styles";
 
@@ -12,6 +14,7 @@ import { useFont } from "$app/components/DesignSettings";
 import { useLoggedInUser } from "$app/components/LoggedInUser";
 import { Checkbox } from "$app/components/ui/Checkbox";
 import { Fieldset, FieldsetTitle } from "$app/components/ui/Fieldset";
+import { InputGroup } from "$app/components/ui/InputGroup";
 import { Label } from "$app/components/ui/Label";
 import { useIsDarkTheme } from "$app/components/useIsDarkTheme";
 
@@ -25,7 +28,7 @@ const useFail = () => {
   return React.useCallback(() => dispatch({ type: "cancel" }), [dispatch]);
 };
 
-const PaymentElementBody = () => {
+const PaymentElementBody = ({ toggle }: { toggle: React.ReactNode }) => {
   const [state, dispatch] = useState();
   const stripe = useStripe();
   const elements = useElements();
@@ -34,10 +37,6 @@ const PaymentElementBody = () => {
 
   const [keepOnFile, setKeepOnFile] = React.useState(isLoggedIn);
   const [cardError, setCardError] = React.useState(false);
-
-  React.useEffect(() => {
-    dispatch({ type: "add-payment-method", paymentMethod: { type: "card", button: null } });
-  }, []);
 
   React.useEffect(() => {
     if (state.status.type !== "starting" || state.paymentMethod !== "card") return;
@@ -83,6 +82,7 @@ const PaymentElementBody = () => {
       <Fieldset state={cardError ? "danger" : undefined}>
         <FieldsetTitle>
           <Label>Card information</Label>
+          {toggle}
         </FieldsetTitle>
         <PaymentElement
           options={{ wallets: { applePay: "never", googlePay: "never" } }}
@@ -103,6 +103,31 @@ const PaymentElementBody = () => {
   );
 };
 
+// Buyers with a saved card can pay with it without mounting the Payment Element; the saved-card
+// charge path is unchanged (the order request omits card params, so Rails uses the stored card).
+const SavedCardBody = ({ savedCreditCard, toggle }: { savedCreditCard: SavedCreditCard; toggle: React.ReactNode }) => {
+  const [state, dispatch] = useState();
+
+  React.useEffect(() => {
+    if (state.status.type !== "starting" || state.paymentMethod !== "card") return;
+    dispatch({ type: "set-payment-method", paymentMethod: { type: "saved" } });
+  }, [state.status.type]);
+
+  return (
+    <Fieldset>
+      <FieldsetTitle>
+        <Label>Card information</Label>
+        {toggle}
+      </FieldsetTitle>
+      <InputGroup readOnly aria-label="Saved credit card">
+        <CreditCard className="size-5" />
+        <span>{savedCreditCard.number}</span>
+        <span style={{ marginLeft: "auto" }}>{savedCreditCard.expiration_date}</span>
+      </InputGroup>
+    </Fieldset>
+  );
+};
+
 // Gumroad's CSS color variables are stored as space-separated RGB triplets (e.g. "0 0 0").
 const cssColor = (name: string) => {
   const value = getCssVariable(name).trim();
@@ -110,10 +135,32 @@ const cssColor = (name: string) => {
 };
 
 export const PaymentElementCardContent = () => {
-  const [state] = useState();
+  const [state, dispatch] = useState();
   const font = useFont();
   const isDark = useIsDarkTheme();
   const [stripePromise] = React.useState(getStripeInstance);
+  const savedCreditCard = state.savedCreditCard;
+  const [useSavedCard, setUseSavedCard] = React.useState(savedCreditCard != null);
+
+  React.useEffect(() => {
+    dispatch({ type: "add-payment-method", paymentMethod: { type: "card", button: null } });
+  }, []);
+
+  const toggle =
+    savedCreditCard != null ? (
+      <button
+        type="button"
+        className="cursor-pointer font-normal underline all-unset"
+        disabled={isProcessing(state)}
+        onClick={() => setUseSavedCard(!useSavedCard)}
+      >
+        {useSavedCard ? "Use a different card?" : "Use saved card"}
+      </button>
+    ) : null;
+
+  if (savedCreditCard != null && useSavedCard) {
+    return <SavedCardBody savedCreditCard={savedCreditCard} toggle={toggle} />;
+  }
 
   // Eligibility (see isPaymentElementEligible) guarantees a stable, above-minimum amount here.
   const amount = getTotalPrice(state) ?? 0;
@@ -144,7 +191,7 @@ export const PaymentElementCardContent = () => {
         fonts: [{ family: font.name, src: `url(${font.url})` }],
       }}
     >
-      <PaymentElementBody />
+      <PaymentElementBody toggle={toggle} />
     </Elements>
   );
 };
