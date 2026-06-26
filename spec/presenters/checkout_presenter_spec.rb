@@ -605,6 +605,26 @@ describe CheckoutPresenter do
       purchase_queries = queries.select { |sql| sql.match?(/purchases/i) }
       expect(purchase_queries.size).to be <= 2
     end
+
+    describe "Payment Element eligibility flag" do
+      let(:seller) { create(:named_user) }
+      let(:product) { create(:product, user: seller) }
+      let(:instance) { described_class.new(logged_in_user: nil, ip: "127.0.0.1") }
+
+      it "marks the creator as Payment Element enabled when the seller has the flag" do
+        Feature.activate_user(:stripe_payment_element, seller)
+
+        props = instance.checkout_product(product, product.cart_item({}), {})
+
+        expect(props[:product][:creator][:payment_element_enabled]).to eq(true)
+      end
+
+      it "marks the creator as not Payment Element enabled when the seller lacks the flag" do
+        props = instance.checkout_product(product, product.cart_item({}), {})
+
+        expect(props[:product][:creator][:payment_element_enabled]).to eq(false)
+      end
+    end
   end
 
   describe "#subscription_manager_props", :vcr do
