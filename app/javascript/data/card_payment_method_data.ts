@@ -46,6 +46,7 @@ export const prepareCardPaymentMethodData = async (
     stripe_payment_method_id: paymentMethodResult.paymentMethod.id,
     card_country: paymentMethodResult.paymentMethod.card?.country ?? null,
     card_country_source: "stripe",
+    checkout_surface: "card_element",
   };
 };
 
@@ -79,6 +80,7 @@ export const prepareCardPaymentMethodDataFromElements = async (data: {
     stripe_payment_method_id: paymentMethodResult.paymentMethod.id,
     card_country: paymentMethodResult.paymentMethod.card?.country ?? null,
     card_country_source: "stripe",
+    checkout_surface: "payment_element",
   };
 };
 

@@ -283,6 +283,10 @@ export const createPurchasesRequestData = (
         data.card_country_source = paymentParams.card_country_source;
         data.card_country = paymentParams.card_country || "";
 
+        if (paymentParams.type === "card" && paymentParams.checkout_surface) {
+          data.checkout_surface = paymentParams.checkout_surface;
+        }
+
         if (paymentParams.type === "payment-request") {
           data.wallet_type = paymentParams.wallet_type;
         }
