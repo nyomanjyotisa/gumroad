@@ -742,17 +742,29 @@ const CreditCardContent = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      {stripePaymentElementConfig ? (
-        <PaymentElementInput
-          amount={stripePaymentElementAmount}
-          elementsOptions={stripePaymentElementConfig}
-          disabled={isProcessing(state)}
-          onReady={(controller) => (paymentElementRef.current = controller)}
-          invalid={cardError}
-          onChange={(evt) => {
-            if (evt.complete) setCardError(false);
-          }}
-        />
+      {stripePaymentElementConfig && !useSavedCard ? (
+        <div className="flex flex-col gap-2">
+          {state.savedCreditCard ? (
+            <button
+              type="button"
+              className="cursor-pointer self-start font-normal underline all-unset"
+              disabled={isProcessing(state)}
+              onClick={() => setUseSavedCard(true)}
+            >
+              Use saved card
+            </button>
+          ) : null}
+          <PaymentElementInput
+            amount={stripePaymentElementAmount}
+            elementsOptions={stripePaymentElementConfig}
+            disabled={isProcessing(state)}
+            onReady={(controller) => (paymentElementRef.current = controller)}
+            invalid={cardError}
+            onChange={(evt) => {
+              if (evt.complete) setCardError(false);
+            }}
+          />
+        </div>
       ) : (
         <CreditCardInput
           savedCreditCard={state.savedCreditCard}

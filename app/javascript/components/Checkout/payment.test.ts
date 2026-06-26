@@ -97,14 +97,14 @@ describe("canUseStripePaymentElement", () => {
     expect(canUseStripePaymentElement(state({ checkoutPayment: cardElementConfig }))).toBe(false);
   });
 
-  it("falls back when a saved card is available", () => {
+  it("allows a checkout when a saved card is available (the saved-card toggle handles it)", () => {
     expect(
       canUseStripePaymentElement(
         state({
           savedCreditCard: { type: "visa", number: "**** 4242", expiration_date: "12/30", requires_mandate: false },
         }),
       ),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("falls back for reusable payment method flows", () => {

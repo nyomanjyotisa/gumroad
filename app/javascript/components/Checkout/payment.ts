@@ -168,7 +168,6 @@ export function canUseStripePaymentElement(state: State) {
 
   return (
     state.checkoutPayment.integration === "payment_element" &&
-    !state.savedCreditCard &&
     !requiresReusablePaymentMethod(state) &&
     !state.products.some(
       (product) => product.payInInstallments || product.hasFreeTrial || product.nativeType === "commission",
