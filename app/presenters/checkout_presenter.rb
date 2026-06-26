@@ -311,7 +311,7 @@ class CheckoutPresenter
           profile_url: product.user.profile_url(recommended_by:),
           avatar_url: product.user.avatar_url,
           id: product.user.external_id,
-          payment_element_enabled: Feature.active?(:stripe_payment_element, product.user),
+          payment_element_enabled: Checkout::PaymentMethodEligibility.for_seller(product.user).payment_element_enabled,
         } : nil,
         currency_code: product.price_currency_type.downcase,
         price_cents: product.price_cents,
