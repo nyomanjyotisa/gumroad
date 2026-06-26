@@ -149,11 +149,11 @@ export function requiresReusablePaymentMethod(state: State) {
 // Stripe rejects card charges below the minimum chargeable amount (50 cents for USD).
 const STRIPE_MINIMUM_CHARGE_CENTS = 50;
 
-// Phase 1 of the Stripe Payment Element migration (issue #5362): conservatively route only
-// single-seller, card-only, charged purchases through the Payment Element. Everything else
-// (saved cards, multi-seller, subscriptions, commissions, installments, free/setup-only carts,
-// below-minimum or not-yet-loaded amounts) keeps using the existing CardElement path. The
-// seller-scoped feature flag is decided on the server and carried in `creator.payment_element_enabled`.
+// Stripe Payment Element migration (issue #5362): conservatively route single-seller, card-only
+// carts through the Payment Element — charged purchases and free trials (which collect a card now
+// and charge after the trial). Saved cards, multi-seller, managed subscriptions, commissions,
+// installments, fully-free carts, and below-minimum/not-yet-loaded amounts keep the existing
+// CardElement path. The seller-scoped flag is decided on the server (`creator.payment_element_enabled`).
 export function isPaymentElementEligible(state: State) {
   if (!requiresPayment(state)) return false;
   if (requiresReusablePaymentMethod(state)) return false;
@@ -161,7 +161,17 @@ export function isPaymentElementEligible(state: State) {
   if (state.products.some((product) => product.payInInstallments)) return false;
   if (!state.products[0]?.creator.payment_element_enabled) return false;
   const total = getTotalPrice(state);
-  return total !== null && total >= STRIPE_MINIMUM_CHARGE_CENTS;
+  if (total === null) return false;
+  // Free trials collect a card now but are charged only after the trial, so there is no immediate
+  // amount; the Payment Element mounts in setup mode (see paymentElementMode).
+  if (total === 0) return state.products.every((product) => product.hasFreeTrial);
+  return total >= STRIPE_MINIMUM_CHARGE_CENTS;
+}
+
+// Free-trial carts collect the card without an immediate charge (SetupIntent); everything else
+// charges now (PaymentIntent).
+export function paymentElementMode(state: State): "payment" | "setup" {
+  return getTotalPrice(state) === 0 ? "setup" : "payment";
 }
 
 export function isProcessing(state: State) {

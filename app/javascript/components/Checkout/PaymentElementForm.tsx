@@ -1,5 +1,5 @@
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import { Appearance } from "@stripe/stripe-js";
+import { Appearance, StripeElementsOptions } from "@stripe/stripe-js";
 import * as React from "react";
 
 import { prepareCardPaymentMethodDataFromElements } from "$app/data/card_payment_method_data";
@@ -7,7 +7,7 @@ import { AnyPaymentMethodResult } from "$app/data/payment_method_result";
 import { getStripeInstance } from "$app/utils/stripe_loader";
 import { getCssVariable } from "$app/utils/styles";
 
-import { getTotalPrice, isProcessing, useState } from "$app/components/Checkout/payment";
+import { getTotalPrice, isProcessing, paymentElementMode, useState } from "$app/components/Checkout/payment";
 import { useFont } from "$app/components/DesignSettings";
 import { useLoggedInUser } from "$app/components/LoggedInUser";
 import { Checkbox } from "$app/components/ui/Checkbox";
@@ -115,9 +115,6 @@ export const PaymentElementCardContent = () => {
   const isDark = useIsDarkTheme();
   const [stripePromise] = React.useState(getStripeInstance);
 
-  // Eligibility (see isPaymentElementEligible) guarantees a stable, above-minimum amount here.
-  const amount = getTotalPrice(state) ?? 0;
-
   // Match the Payment Element to the checkout's light/dark theme; otherwise Stripe's default
   // light theme renders dark labels that are invisible on the dark checkout surface.
   const appearance: Appearance = {
@@ -131,19 +128,22 @@ export const PaymentElementCardContent = () => {
     },
   };
 
+  const sharedOptions = {
+    currency: "usd",
+    paymentMethodCreation: "manual",
+    paymentMethodTypes: ["card"],
+    appearance,
+    fonts: [{ family: font.name, src: `url(${font.url})` }],
+  } satisfies Partial<StripeElementsOptions>;
+
+  // Free trials use setup mode (no immediate charge); everything else charges the cart total now.
+  const options: StripeElementsOptions =
+    paymentElementMode(state) === "setup"
+      ? { mode: "setup", ...sharedOptions }
+      : { mode: "payment", amount: getTotalPrice(state) ?? 0, ...sharedOptions };
+
   return (
-    <Elements
-      stripe={stripePromise}
-      options={{
-        mode: "payment",
-        amount,
-        currency: "usd",
-        paymentMethodCreation: "manual",
-        paymentMethodTypes: ["card"],
-        appearance,
-        fonts: [{ family: font.name, src: `url(${font.url})` }],
-      }}
-    >
+    <Elements stripe={stripePromise} options={options}>
       <PaymentElementBody />
     </Elements>
   );
