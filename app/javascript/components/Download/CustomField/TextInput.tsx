@@ -41,20 +41,25 @@ export const TextInput = ({
       const newValue = evt.target.value;
       if (newValue === savedValue) return;
       setIsLoading(true);
-      await request({
-        method: "POST",
-        accept: "json",
-        url: Routes.purchase_custom_fields_path(),
-        data: {
-          purchase_id: purchaseInfo.purchaseId,
-          custom_field_id: customFieldId,
-          value: newValue,
-          token: purchaseInfo.token,
-        },
-      });
-      setIsLoading(false);
-      setSavedValue(newValue);
-      showAlert("Response saved!", "success");
+      try {
+        await request({
+          method: "POST",
+          accept: "json",
+          url: Routes.purchase_custom_fields_path(),
+          data: {
+            purchase_id: purchaseInfo.purchaseId,
+            custom_field_id: customFieldId,
+            value: newValue,
+            token: purchaseInfo.token,
+          },
+        });
+        setSavedValue(newValue);
+        showAlert("Response saved!", "success");
+      } catch {
+        showAlert("Your response could not be saved. Please try again.", "error");
+      } finally {
+        setIsLoading(false);
+      }
     }),
     disabled: isLoading,
   };
