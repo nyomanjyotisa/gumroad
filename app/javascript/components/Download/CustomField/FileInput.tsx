@@ -79,6 +79,7 @@ export const FileInput = ({ customFieldId }: { customFieldId: string }) => {
     } catch {
       showAlert("Error uploading files. Please try again.", "error");
     } finally {
+      event.target.value = "";
       setIsUploading(false);
     }
   });
