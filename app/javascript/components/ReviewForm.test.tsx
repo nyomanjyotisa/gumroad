@@ -125,6 +125,58 @@ const postButton = () => screen.getByRole<HTMLButtonElement>("button", { name: "
 const chooseVideoReview = () => fireEvent.click(screen.getByRole("radio", { name: "Video review" }));
 const chooseTextReview = () => fireEvent.click(screen.getByRole("radio", { name: "Text review" }));
 
+describe("ReviewForm mode keyboard navigation", () => {
+  it("selects and focuses modes with arrows, wrapping, Home, and End", () => {
+    render(withProviders(form(), false));
+    const text = screen.getByRole<HTMLButtonElement>("radio", { name: "Text review" });
+    const video = screen.getByRole<HTMLButtonElement>("radio", { name: "Video review" });
+    text.focus();
+    for (const [key, expected] of [
+      ["ArrowRight", video],
+      ["ArrowDown", text],
+      ["ArrowUp", video],
+      ["ArrowLeft", text],
+      ["End", video],
+      ["Home", text],
+    ] as const) {
+      fireEvent.keyDown(document.activeElement ?? text, { key });
+      expect(document.activeElement).toBe(expected);
+      expect(expected.getAttribute("aria-checked")).toBe("true");
+    }
+  });
+
+  it("keeps only the selected review mode in the tab order", () => {
+    render(withProviders(form(), false));
+    const text = screen.getByRole<HTMLButtonElement>("radio", { name: "Text review" });
+    const video = screen.getByRole<HTMLButtonElement>("radio", { name: "Video review" });
+    expect(text.tabIndex).toBe(0);
+    expect(video.tabIndex).toBe(-1);
+    fireEvent.click(video);
+    expect(text.tabIndex).toBe(-1);
+    expect(video.tabIndex).toBe(0);
+  });
+
+  it("does not activate disabled review modes", () => {
+    render(withProviders(form({ disabledStatus: "Reviews are disabled" }), false));
+    const text = screen.getByRole<HTMLButtonElement>("radio", { name: "Text review" });
+    const video = screen.getByRole<HTMLButtonElement>("radio", { name: "Video review" });
+    expect(text.disabled).toBe(true);
+    expect(video.disabled).toBe(true);
+    fireEvent.keyDown(text, { key: "ArrowRight" });
+    expect(text.getAttribute("aria-checked")).toBe("true");
+    expect(video.getAttribute("aria-checked")).toBe("false");
+  });
+
+  it("leaves Tab and unrelated keys to the browser", () => {
+    render(withProviders(form(), false));
+    const text = screen.getByRole("radio", { name: "Text review" });
+    text.focus();
+    expect(fireEvent.keyDown(text, { key: "Tab" })).toBe(true);
+    expect(fireEvent.keyDown(text, { key: "a" })).toBe(true);
+    expect(text.getAttribute("aria-checked")).toBe("true");
+  });
+});
+
 describe("ReviewForm upload context", () => {
   describe("while no video can be recorded", () => {
     it("does not request the upload context when a logged-in buyer opens a new review form", () => {
