@@ -57,7 +57,7 @@ export const ComboBox = <Option extends unknown>({
   const moveCursor = (from: number, by: number) => {
     let i = from;
     do {
-      i = (from + by) % options.length;
+      i = (from + by + options.length) % options.length;
       if (!itemRefs[i]?.inert) {
         setFocusedOptionIndex(i);
         break;
@@ -102,7 +102,7 @@ export const ComboBox = <Option extends unknown>({
         "aria-expanded": open,
         "aria-controls": uid,
         inert: disabled,
-        "aria-activedescendant": focusedOptionIndex ? `${uid}-${focusedOptionIndex}` : undefined,
+        "aria-activedescendant": focusedOptionIndex !== null ? `${uid}-${focusedOptionIndex}` : undefined,
         ...(editable
           ? {
               onFocus: () => toggle(true),
