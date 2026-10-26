@@ -364,11 +364,46 @@ export const ReviewForm = React.forwardRef<
     };
 
     const reviewModeRadioButtons = (
-      <Tabs variant="buttons" className="grid-cols-2!" role="radiogroup">
-        <Tab isSelected={reviewMode === "text"} asChild>
+      <Tabs
+        variant="buttons"
+        className="grid-cols-2!"
+        role="radiogroup"
+        onKeyDown={(event) => {
+          if (event.altKey || event.ctrlKey || event.metaKey) return;
+          const radios = Array.from(
+            event.currentTarget.querySelectorAll<HTMLButtonElement>('button[role="radio"]:not(:disabled)'),
+          );
+          if (radios.length === 0) return;
+          const index = radios.findIndex((radio) => radio === document.activeElement);
+          let next: number;
+          switch (event.key) {
+            case "ArrowRight":
+            case "ArrowDown":
+              next = (index + 1) % radios.length;
+              break;
+            case "ArrowLeft":
+            case "ArrowUp":
+              next = index <= 0 ? radios.length - 1 : index - 1;
+              break;
+            case "Home":
+              next = 0;
+              break;
+            case "End":
+              next = radios.length - 1;
+              break;
+            default:
+              return;
+          }
+          event.preventDefault();
+          radios[next]?.click();
+          radios[next]?.focus();
+        }}
+      >
+        <Tab isSelected={reviewMode === "text"} aria-selected={undefined} asChild>
           <Button
             role="radio"
             aria-checked={reviewMode === "text"}
+            tabIndex={reviewMode === "text" ? 0 : -1}
             onClick={() => setReviewMode("text")}
             disabled={disabled || reviewVideoRecorderBusy}
             className="disabled:pointer-events-none"
@@ -376,10 +411,11 @@ export const ReviewForm = React.forwardRef<
             <div className="w-full text-center">Text review</div>
           </Button>
         </Tab>
-        <Tab isSelected={reviewMode === "video"} asChild>
+        <Tab isSelected={reviewMode === "video"} aria-selected={undefined} asChild>
           <Button
             role="radio"
             aria-checked={reviewMode === "video"}
+            tabIndex={reviewMode === "video" ? 0 : -1}
             onClick={() => setReviewMode("video")}
             disabled={disabled || reviewVideoRecorderBusy}
             className="disabled:pointer-events-none"
