@@ -13,18 +13,22 @@ afterEach(() => {
 });
 
 it.each([
-  { label: "Today", from: "2025-12-31", to: "2025-12-31" },
-  { label: "Last 7 days", from: "2025-12-25", to: "2025-12-31" },
-  { label: "Last month", from: "2025-11-01", to: "2025-11-30" },
-])("anchors $label to the seller's date across a month boundary", ({ label, from, to }) => {
+  { timeZone: "Pacific/Honolulu", label: "Today", from: "2025-12-31", to: "2025-12-31" },
+  { timeZone: "Pacific/Honolulu", label: "Last 7 days", from: "2025-12-25", to: "2025-12-31" },
+  { timeZone: "Pacific/Honolulu", label: "Last month", from: "2025-11-01", to: "2025-11-30" },
+  { timeZone: "Pacific/Kiritimati", label: "Today", from: "2026-01-01", to: "2026-01-01" },
+  { timeZone: "Pacific/Kiritimati", label: "Last 7 days", from: "2025-12-26", to: "2026-01-01" },
+  { timeZone: "Pacific/Kiritimati", label: "Last month", from: "2025-12-01", to: "2025-12-31" },
+])("anchors $label to the seller's date in $timeZone", ({ label, from, to, timeZone }) => {
   vi.useFakeTimers({ toFake: ["Date"] });
-  vi.setSystemTime(new Date("2026-01-01T01:00:00Z"));
+  // The two seller zones are on opposite days at this instant, regardless of the runner's zone.
+  vi.setSystemTime(new Date("2026-01-01T08:00:00Z"));
   const setFrom = vi.fn<(date: Date) => void>();
   const setTo = vi.fn<(date: Date) => void>();
   const selected = new Date(2025, 11, 31);
   render(
     <UserAgentProvider value={{ isMobile: false, locale: "en-US" }}>
-      <DateRangePicker from={selected} to={selected} setFrom={setFrom} setTo={setTo} timeZone="America/Los_Angeles" />
+      <DateRangePicker from={selected} to={selected} setFrom={setFrom} setTo={setTo} timeZone={timeZone} />
     </UserAgentProvider>,
   );
 
