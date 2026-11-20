@@ -61,6 +61,15 @@ describe("normalizeSearchQuery", () => {
 });
 
 describe("Search", () => {
+  it("names the search field after a query is entered", () => {
+    render(<Search value="Jane" onSearch={vi.fn()} placeholder="Search sales" />);
+    expect(screen.getByRole("button", { name: "Toggle Search" })).toBeTruthy();
+    const input = openSearch();
+
+    expect(screen.getByRole("textbox", { name: "Search sales" })).toBe(input);
+    expect(input.value).toBe("Jane");
+  });
+
   it("searches for the bare address when a mailto: link is pasted", () => {
     const onSearch = vi.fn();
     render(<Search value="" onSearch={onSearch} placeholder="Search sales" />);
