@@ -59,7 +59,7 @@ export const ComboBox = <Option extends unknown>({
     let remaining = options.length;
     while (remaining > 0) {
       remaining--;
-      i = (i + by) % options.length;
+      i = (i + by + options.length) % options.length;
       const item = itemRefs[i];
       if (item && !item.inert) {
         setFocusedOptionIndex(i);

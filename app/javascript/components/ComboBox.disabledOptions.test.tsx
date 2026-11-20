@@ -8,7 +8,7 @@ import { ComboBox } from "$app/components/ComboBox";
 afterEach(cleanup);
 
 const setup = (disabled: boolean[]) => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(option: string) => void>();
   let inspections = 0;
   render(
     <ComboBox
@@ -65,6 +65,14 @@ describe("ComboBox disabled-option navigation", () => {
     fireEvent.keyUp(window, { key: "Enter" });
     expect(state.onSelect).not.toHaveBeenCalled();
     expect(state.inspections()).toBe(0);
+  });
+
+  it("wraps backwards past disabled options at the end of the list", () => {
+    const { onSelect } = setup([false, false, true]);
+    fireEvent.keyUp(window, { key: "ArrowDown" });
+    fireEvent.keyUp(window, { key: "ArrowUp" });
+    fireEvent.keyUp(window, { key: "Enter" });
+    expect(onSelect).toHaveBeenCalledExactlyOnceWith("Option 2");
   });
 
   it("keeps normal option selection working", () => {
