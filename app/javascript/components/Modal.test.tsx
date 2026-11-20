@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Modal } from "$app/components/Modal";
 
@@ -54,4 +54,23 @@ describe("Modal", () => {
     // Without a Dialog.Trigger, Radix has nothing to restore to.
     await waitFor(() => expect(document.activeElement).toBe(document.body));
   });
+});
+
+it("keeps a modal open on Escape while closing is disallowed", () => {
+  const onClose = vi.fn();
+  const { rerender } = render(
+    <Modal title="Working" open allowClose={false} onClose={onClose}>
+      Body
+    </Modal>,
+  );
+  fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+  expect(onClose).not.toHaveBeenCalled();
+
+  rerender(
+    <Modal title="Working" open onClose={onClose}>
+      Body
+    </Modal>,
+  );
+  fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+  expect(onClose).toHaveBeenCalledOnce();
 });
