@@ -74,3 +74,24 @@ it("keeps a modal open on Escape while closing is disallowed", () => {
   fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
   expect(onClose).toHaveBeenCalledOnce();
 });
+
+it("allows outside pointer dismissal only after the modal unlocks", async () => {
+  const onClose = vi.fn();
+  const { rerender } = render(
+    <Modal title="Working" open allowClose={false} onClose={onClose}>
+      Body
+    </Modal>,
+  );
+  // Radix attaches the outside-pointer listener on the next task.
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  fireEvent.pointerDown(document.body, { pointerType: "mouse" });
+  expect(onClose).not.toHaveBeenCalled();
+
+  rerender(
+    <Modal title="Working" open onClose={onClose}>
+      Body
+    </Modal>,
+  );
+  fireEvent.pointerDown(document.body, { pointerType: "mouse" });
+  expect(onClose).toHaveBeenCalledOnce();
+});
