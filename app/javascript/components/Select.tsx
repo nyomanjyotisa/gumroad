@@ -383,6 +383,7 @@ const Option = <IsMulti extends boolean>(props: OptionProps<Option, IsMulti>) =>
       onMouseOver={innerProps.onMouseOver}
       tabIndex={innerProps.tabIndex}
       role="option"
+      aria-selected={props.isSelected}
       aria-disabled={props.isDisabled}
     >
       {customProps.customOption?.({ id: props.label, label: props.label }) ?? props.children}
