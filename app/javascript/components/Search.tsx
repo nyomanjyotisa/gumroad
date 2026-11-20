@@ -59,6 +59,7 @@ export const Search = ({ onSearch, value, placeholder = "Search" }: SearchProps)
             value={searchQuery}
             type="text"
             placeholder={placeholder}
+            aria-label={placeholder}
             onChange={(e) => {
               // Normalize the visible text too, not just what we send to the server, so the field
               // shows the seller exactly what is being searched for.
