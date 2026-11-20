@@ -70,6 +70,7 @@ export const ReviewResponseForm = ({
           <Textarea
             value={message}
             placeholder="Add a response to the review"
+            aria-label="Response to the review"
             onChange={(event) => setMessage(event.target.value)}
             disabled={isLoading}
             required
