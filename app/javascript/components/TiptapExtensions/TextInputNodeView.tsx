@@ -32,6 +32,7 @@ export const TextInputNodeView = ({ editor, node, updateAttributes, getPos }: No
               <Input
                 value={label ?? ""}
                 placeholder="Title"
+                aria-label="Question title"
                 onChange={(evt) => updateAttributes({ label: evt.target.value })}
                 className="border-0"
                 style={{
