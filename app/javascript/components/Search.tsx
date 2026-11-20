@@ -23,7 +23,7 @@ const MAILTO_PREFIX = /^\s*mailto:(?:\/\/)?/iu;
 export const normalizeSearchQuery = (raw: string): string => {
   if (!MAILTO_PREFIX.test(raw)) return raw;
 
-  const withoutPrefix = raw.replace(MAILTO_PREFIX, "").split("?")[0] ?? "";
+  const withoutPrefix = raw.replace(MAILTO_PREFIX, "").split("?")[0];
   // mailto links are URLs, so the address may be percent-encoded ("foo%40example.com"). Decoding
   // can throw on a malformed sequence (a bare "%" the seller typed), in which case we keep the
   // undecoded text rather than losing what they pasted.
