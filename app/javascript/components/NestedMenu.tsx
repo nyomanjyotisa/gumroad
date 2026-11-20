@@ -257,6 +257,7 @@ const MenubarItem = ({
         aria-controls={hasChildren ? uid : undefined}
         {...extraAriaAttrs}
         onClick={(e) => {
+          if (menuItem.href && (e.metaKey || e.ctrlKey || e.shiftKey)) return;
           if (hasChildren) {
             if (isOnTouchDevice) e.preventDefault();
             else onSelectItem?.(menuItem, e);
