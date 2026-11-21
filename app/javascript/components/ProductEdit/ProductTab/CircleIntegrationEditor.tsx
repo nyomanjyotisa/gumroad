@@ -82,19 +82,6 @@ export const CircleIntegrationEditor = ({
     integration ? parseInt(integration.integration_details.space_group_id, 10) : null,
   );
 
-  React.useEffect(() => {
-    if (!apiKey || !selectedCommunityId || !selectedSpaceGroupId) return;
-    onChange({
-      name: "circle",
-      api_key: apiKey,
-      keep_inactive_members: false,
-      integration_details: {
-        community_id: selectedCommunityId.toString(),
-        space_group_id: selectedSpaceGroupId.toString(),
-      },
-    });
-  }, [selectedSpaceGroupId]);
-
   const setEnabledForOptions = (enabled: boolean) =>
     updateProduct((product) => {
       for (const variant of product.variants) variant.integrations = { ...variant.integrations, circle: enabled };
@@ -185,7 +172,18 @@ export const CircleIntegrationEditor = ({
                     id={`${uid}-space-group`}
                     value={selectedSpaceGroupId ?? "select-space-group"}
                     onChange={(ev) => {
-                      setSelectedSpaceGroupId(parseInt(ev.target.value, 10));
+                      const spaceGroupId = parseInt(ev.target.value, 10);
+                      if (!apiKey || !selectedCommunityId || !spaceGroupId) return;
+                      setSelectedSpaceGroupId(spaceGroupId);
+                      onChange({
+                        name: "circle",
+                        api_key: apiKey,
+                        keep_inactive_members: integration?.keep_inactive_members ?? false,
+                        integration_details: {
+                          community_id: selectedCommunityId.toString(),
+                          space_group_id: spaceGroupId.toString(),
+                        },
+                      });
                       setEnabledForOptions(true);
                     }}
                   >
