@@ -92,6 +92,7 @@ export const FollowForm = ({
           <Input
             ref={emailInputRef}
             type="email"
+            aria-label="Email address"
             value={email}
             className="flex-1"
             onChange={(event) => setEmail(event.target.value)}
